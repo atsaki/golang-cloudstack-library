@@ -87,3 +87,11 @@ This returns JSON response as follows.
     ]
 }
 ```
+
+Projects Using This Library
+===========================
+
+* lockgate
+  * https://github.com/atsaki/lockgate
+
+
