@@ -17,14 +17,13 @@ import (
 )
 
 func takeContentFromAPIResponse(
-	command string, response []byte) (content interface{}, err error) {
-	var v interface{}
-	var ok bool
-	if err = json.Unmarshal(response, &v); err != nil {
+	command string, response []byte) ([]byte, error) {
+	var v map[string]json.RawMessage
+	if err := json.Unmarshal(response, &v); err != nil {
 		log.Println("json.Unmarshal failed:", err)
 		return nil, err
 	}
-	content, ok = v.(map[string]interface{})[strings.ToLower(command)+"response"]
+	content, ok := v[strings.ToLower(command)+"response"]
 	if !ok {
 		return nil, errors.New("Unexpected Response format")
 	}
@@ -94,12 +93,7 @@ func (c *Client) RequestNoWait(command string, params map[string]string) ([]byte
 		log.Println("takeContentFromAPIResponse failed:", err)
 		return nil, err
 	}
-	b, err := json.Marshal(content)
-	if err != nil {
-		log.Println("json.Marshal failed:", err)
-		return nil, err
-	}
-	return b, nil
+	return content, nil
 }
 
 func (c *Client) GenerateQueryURL(command string, params map[string]string) string {
@@ -220,8 +214,19 @@ func (c *Client) Request(command string, params map[string]string) ([]byte, erro
 
 	if isAsync {
 		qr := new(QueryAsyncJobResultResponse)
-		json.Unmarshal(b, qr)
+
+		err = json.Unmarshal(b, qr)
+		if err != nil {
+			log.Println("Unmarshal failed", err)
+			return nil, err
+		}
+
 		qr, err = c.Wait(qr.Jobid.String)
+		if err != nil {
+			log.Println("Wait failed", err)
+			return nil, err
+		}
+
 		return qr.Jobresult, nil
 	} else {
 		return b, nil
