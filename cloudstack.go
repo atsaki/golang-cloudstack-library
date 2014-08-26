@@ -108,6 +108,9 @@ func (c *Client) GenerateQueryURL(command string, params map[string]string) stri
 	values := url.Values{}
 	values.Add("command", command)
 	values.Add("response", "json")
+	for k, v := range params {
+		values.Add(k, v)
+	}
 
 	if c.APIKey != "" && c.SecretKey != "" {
 		values.Add("apikey", c.APIKey)
