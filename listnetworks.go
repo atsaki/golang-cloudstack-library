@@ -201,98 +201,21 @@ func (p *ListNetworksParameter) ToMap() map[string]string {
 	}
 	return m
 }
-
-type ListNetworksResponse struct {
-	Count   float64 `json:"count"`
-	Network []struct {
-		Account                     NullString `json:"account"`
-		Aclid                       ID         `json:"aclid"`
-		Acltype                     NullString `json:"acltype"`
-		Broadcastdomaintype         NullString `json:"broadcastdomaintype"`
-		Broadcasturi                NullString `json:"broadcasturi"`
-		Canusefordeploy             NullBool   `json:"canusefordeploy"`
-		Cidr                        NullString `json:"cidr"`
-		Displaynetwork              NullBool   `json:"displaynetwork"`
-		Displaytext                 NullString `json:"displaytext"`
-		Dns1                        NullString `json:"dns1"`
-		Dns2                        NullString `json:"dns2"`
-		Domain                      NullString `json:"domain"`
-		Domainid                    ID         `json:"domainid"`
-		Gateway                     NullString `json:"gateway"`
-		Id                          ID         `json:"id"`
-		Ip6cidr                     NullString `json:"ip6cidr"`
-		Ip6gateway                  NullString `json:"ip6gateway"`
-		Isdefault                   NullBool   `json:"isdefault"`
-		Ispersistent                NullBool   `json:"ispersistent"`
-		Issystem                    NullBool   `json:"issystem"`
-		Name                        NullString `json:"name"`
-		Netmask                     NullString `json:"netmask"`
-		Networkcidr                 NullString `json:"networkcidr"`
-		Networkdomain               NullString `json:"networkdomain"`
-		Networkofferingavailability NullString `json:"networkofferingavailability"`
-		Networkofferingconservemode NullBool   `json:"networkofferingconservemode"`
-		Networkofferingdisplaytext  NullString `json:"networkofferingdisplaytext"`
-		Networkofferingid           ID         `json:"networkofferingid"`
-		Networkofferingname         NullString `json:"networkofferingname"`
-		Physicalnetworkid           ID         `json:"physicalnetworkid"`
-		Project                     NullString `json:"project"`
-		Projectid                   ID         `json:"projectid"`
-		Related                     NullString `json:"related"`
-		Reservediprange             NullString `json:"reservediprange"`
-		Restartrequired             NullBool   `json:"restartrequired"`
-		Service                     []struct {
-			Capability []struct {
-				Canchooseservicecapability NullBool   `json:"canchooseservicecapability"`
-				Name                       NullString `json:"name"`
-				Value                      NullString `json:"value"`
-			} `json:"capability"`
-			Name     NullString `json:"name"`
-			Provider []struct {
-				Canenableindividualservice   NullBool     `json:"canenableindividualservice"`
-				Destinationphysicalnetworkid ID           `json:"destinationphysicalnetworkid"`
-				Id                           ID           `json:"id"`
-				Name                         NullString   `json:"name"`
-				Physicalnetworkid            ID           `json:"physicalnetworkid"`
-				Servicelist                  []NullString `json:"servicelist"`
-				State                        NullString   `json:"state"`
-			} `json:"provider"`
-		} `json:"service"`
-		Specifyipranges  NullBool   `json:"specifyipranges"`
-		State            NullString `json:"state"`
-		Strechedl2subnet NullBool   `json:"strechedl2subnet"`
-		Subdomainaccess  NullBool   `json:"subdomainaccess"`
-		Tags             []struct {
-			Account      NullString `json:"account"`
-			Customer     NullString `json:"customer"`
-			Domain       NullString `json:"domain"`
-			Domainid     ID         `json:"domainid"`
-			Key          NullString `json:"key"`
-			Project      NullString `json:"project"`
-			Projectid    ID         `json:"projectid"`
-			Resourceid   ID         `json:"resourceid"`
-			Resourcetype NullString `json:"resourcetype"`
-			Value        NullString `json:"value"`
-		} `json:"tags"`
-		Traffictype       NullString   `json:"traffictype"`
-		Type              NullString   `json:"type"`
-		Vlan              NullString   `json:"vlan"`
-		Vpcid             ID           `json:"vpcid"`
-		Zoneid            ID           `json:"zoneid"`
-		Zonename          NullString   `json:"zonename"`
-		Zonesnetworkspans []NullString `json:"zonesnetworkspans"`
-	} `json:"network"`
-}
-
-func (c *Client) ListNetworks(p ListNetworksParameter) (*ListNetworksResponse, error) {
-	resp := new(ListNetworksResponse)
+func (c *Client) ListNetworks(p ListNetworksParameter) ([]Network, error) {
+	var v map[string]json.RawMessage
+	var ret []Network
 	b, err := c.Request("listNetworks", p.ToMap())
 	if err != nil {
 		log.Println("Request failed:", err)
-		return nil, err
+		return ret, err
 	}
-	err = json.Unmarshal(b, resp)
+	err = json.Unmarshal(b, &v)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
-	return resp, err
+	err = json.Unmarshal(v["network"], &ret)
+	if err != nil {
+		log.Println("json.Unmarshal failed:", err)
+	}
+	return ret, err
 }

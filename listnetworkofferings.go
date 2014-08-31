@@ -173,61 +173,21 @@ func (p *ListNetworkOfferingsParameter) ToMap() map[string]string {
 	}
 	return m
 }
-
-type ListNetworkOfferingsResponse struct {
-	Count           float64 `json:"count"`
-	Networkoffering []struct {
-		Availability        NullString `json:"availability"`
-		Conservemode        NullBool   `json:"conservemode"`
-		Created             NullString `json:"created"`
-		Details             NullString `json:"details"`
-		Displaytext         NullString `json:"displaytext"`
-		Egressdefaultpolicy NullBool   `json:"egressdefaultpolicy"`
-		Forvpc              NullBool   `json:"forvpc"`
-		Guestiptype         NullString `json:"guestiptype"`
-		Id                  ID         `json:"id"`
-		Isdefault           NullBool   `json:"isdefault"`
-		Ispersistent        NullBool   `json:"ispersistent"`
-		Maxconnections      NullInt64  `json:"maxconnections"`
-		Name                NullString `json:"name"`
-		Networkrate         NullInt64  `json:"networkrate"`
-		Service             []struct {
-			Capability []struct {
-				Canchooseservicecapability NullBool   `json:"canchooseservicecapability"`
-				Name                       NullString `json:"name"`
-				Value                      NullString `json:"value"`
-			} `json:"capability"`
-			Name     NullString `json:"name"`
-			Provider []struct {
-				Canenableindividualservice   NullBool     `json:"canenableindividualservice"`
-				Destinationphysicalnetworkid ID           `json:"destinationphysicalnetworkid"`
-				Id                           ID           `json:"id"`
-				Name                         NullString   `json:"name"`
-				Physicalnetworkid            ID           `json:"physicalnetworkid"`
-				Servicelist                  []NullString `json:"servicelist"`
-				State                        NullString   `json:"state"`
-			} `json:"provider"`
-		} `json:"service"`
-		Serviceofferingid        ID         `json:"serviceofferingid"`
-		Specifyipranges          NullBool   `json:"specifyipranges"`
-		Specifyvlan              NullBool   `json:"specifyvlan"`
-		State                    NullString `json:"state"`
-		Supportsstrechedl2subnet NullBool   `json:"supportsstrechedl2subnet"`
-		Tags                     NullString `json:"tags"`
-		Traffictype              NullString `json:"traffictype"`
-	} `json:"networkoffering"`
-}
-
-func (c *Client) ListNetworkOfferings(p ListNetworkOfferingsParameter) (*ListNetworkOfferingsResponse, error) {
-	resp := new(ListNetworkOfferingsResponse)
+func (c *Client) ListNetworkOfferings(p ListNetworkOfferingsParameter) ([]Networkoffering, error) {
+	var v map[string]json.RawMessage
+	var ret []Networkoffering
 	b, err := c.Request("listNetworkOfferings", p.ToMap())
 	if err != nil {
 		log.Println("Request failed:", err)
-		return nil, err
+		return ret, err
 	}
-	err = json.Unmarshal(b, resp)
+	err = json.Unmarshal(b, &v)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
-	return resp, err
+	err = json.Unmarshal(v["networkoffering"], &ret)
+	if err != nil {
+		log.Println("json.Unmarshal failed:", err)
+	}
+	return ret, err
 }

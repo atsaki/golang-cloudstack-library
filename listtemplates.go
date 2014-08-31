@@ -137,70 +137,21 @@ func (p *ListTemplatesParameter) ToMap() map[string]string {
 	}
 	return m
 }
-
-type ListTemplatesResponse struct {
-	Count    float64 `json:"count"`
-	Template []struct {
-		Account               NullString `json:"account"`
-		Accountid             ID         `json:"accountid"`
-		Bootable              NullBool   `json:"bootable"`
-		Checksum              NullString `json:"checksum"`
-		Created               NullString `json:"created"`
-		CrossZones            NullBool   `json:"crosszones"`
-		Details               NullString `json:"details"`
-		Displaytext           NullString `json:"displaytext"`
-		Domain                NullString `json:"domain"`
-		Domainid              ID         `json:"domainid"`
-		Format                NullString `json:"format"`
-		Hostid                ID         `json:"hostid"`
-		Hostname              NullString `json:"hostname"`
-		Hypervisor            NullString `json:"hypervisor"`
-		Id                    ID         `json:"id"`
-		Isdynamicallyscalable NullBool   `json:"isdynamicallyscalable"`
-		Isextractable         NullBool   `json:"isextractable"`
-		Isfeatured            NullBool   `json:"isfeatured"`
-		Ispublic              NullBool   `json:"ispublic"`
-		Isready               NullBool   `json:"isready"`
-		Name                  NullString `json:"name"`
-		Ostypeid              ID         `json:"ostypeid"`
-		Ostypename            NullString `json:"ostypename"`
-		Passwordenabled       NullBool   `json:"passwordenabled"`
-		Project               NullString `json:"project"`
-		Projectid             ID         `json:"projectid"`
-		Removed               NullString `json:"removed"`
-		Size                  NullInt64  `json:"size"`
-		Sourcetemplateid      ID         `json:"sourcetemplateid"`
-		Sshkeyenabled         NullBool   `json:"sshkeyenabled"`
-		Status                NullString `json:"status"`
-		Tags                  []struct {
-			Account      NullString `json:"account"`
-			Customer     NullString `json:"customer"`
-			Domain       NullString `json:"domain"`
-			Domainid     ID         `json:"domainid"`
-			Key          NullString `json:"key"`
-			Project      NullString `json:"project"`
-			Projectid    ID         `json:"projectid"`
-			Resourceid   ID         `json:"resourceid"`
-			Resourcetype NullString `json:"resourcetype"`
-			Value        NullString `json:"value"`
-		} `json:"tags"`
-		Templatetag  NullString `json:"templatetag"`
-		Templatetype NullString `json:"templatetype"`
-		Zoneid       ID         `json:"zoneid"`
-		Zonename     NullString `json:"zonename"`
-	} `json:"template"`
-}
-
-func (c *Client) ListTemplates(p ListTemplatesParameter) (*ListTemplatesResponse, error) {
-	resp := new(ListTemplatesResponse)
+func (c *Client) ListTemplates(p ListTemplatesParameter) ([]Template, error) {
+	var v map[string]json.RawMessage
+	var ret []Template
 	b, err := c.Request("listTemplates", p.ToMap())
 	if err != nil {
 		log.Println("Request failed:", err)
-		return nil, err
+		return ret, err
 	}
-	err = json.Unmarshal(b, resp)
+	err = json.Unmarshal(b, &v)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
-	return resp, err
+	err = json.Unmarshal(v["template"], &ret)
+	if err != nil {
+		log.Println("json.Unmarshal failed:", err)
+	}
+	return ret, err
 }

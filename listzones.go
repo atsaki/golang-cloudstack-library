@@ -97,69 +97,21 @@ func (p *ListZonesParameter) ToMap() map[string]string {
 	}
 	return m
 }
-
-type ListZonesResponse struct {
-	Count float64 `json:"count"`
-	Zone  []struct {
-		Allocationstate NullString `json:"allocationstate"`
-		Capacity        []struct {
-			Capacitytotal NullInt64  `json:"capacitytotal"`
-			Capacityused  NullInt64  `json:"capacityused"`
-			Clusterid     ID         `json:"clusterid"`
-			Clustername   NullString `json:"clustername"`
-			Percentused   NullString `json:"percentused"`
-			Podid         ID         `json:"podid"`
-			Podname       NullString `json:"podname"`
-			Type          NullInt64  `json:"type"`
-			Zoneid        ID         `json:"zoneid"`
-			Zonename      NullString `json:"zonename"`
-		} `json:"capacity"`
-		Description           NullString `json:"description"`
-		Dhcpprovider          NullString `json:"dhcpprovider"`
-		Displaytext           NullString `json:"displaytext"`
-		Dns1                  NullString `json:"dns1"`
-		Dns2                  NullString `json:"dns2"`
-		Domain                NullString `json:"domain"`
-		Domainid              ID         `json:"domainid"`
-		Domainname            NullString `json:"domainname"`
-		Guestcidraddress      NullString `json:"guestcidraddress"`
-		Id                    ID         `json:"id"`
-		Internaldns1          NullString `json:"internaldns1"`
-		Internaldns2          NullString `json:"internaldns2"`
-		Ip6dns1               NullString `json:"ip6dns1"`
-		Ip6dns2               NullString `json:"ip6dns2"`
-		Localstorageenabled   NullBool   `json:"localstorageenabled"`
-		Name                  NullString `json:"name"`
-		Networktype           NullString `json:"networktype"`
-		Resourcedetails       NullString `json:"resourcedetails"`
-		Securitygroupsenabled NullBool   `json:"securitygroupsenabled"`
-		Tags                  []struct {
-			Account      NullString `json:"account"`
-			Customer     NullString `json:"customer"`
-			Domain       NullString `json:"domain"`
-			Domainid     ID         `json:"domainid"`
-			Key          NullString `json:"key"`
-			Project      NullString `json:"project"`
-			Projectid    ID         `json:"projectid"`
-			Resourceid   ID         `json:"resourceid"`
-			Resourcetype NullString `json:"resourcetype"`
-			Value        NullString `json:"value"`
-		} `json:"tags"`
-		Vlan      NullString `json:"vlan"`
-		Zonetoken NullString `json:"zonetoken"`
-	} `json:"zone"`
-}
-
-func (c *Client) ListZones(p ListZonesParameter) (*ListZonesResponse, error) {
-	resp := new(ListZonesResponse)
+func (c *Client) ListZones(p ListZonesParameter) ([]Zone, error) {
+	var v map[string]json.RawMessage
+	var ret []Zone
 	b, err := c.Request("listZones", p.ToMap())
 	if err != nil {
 		log.Println("Request failed:", err)
-		return nil, err
+		return ret, err
 	}
-	err = json.Unmarshal(b, resp)
+	err = json.Unmarshal(b, &v)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
-	return resp, err
+	err = json.Unmarshal(v["zone"], &ret)
+	if err != nil {
+		log.Println("json.Unmarshal failed:", err)
+	}
+	return ret, err
 }
