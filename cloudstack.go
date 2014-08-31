@@ -72,6 +72,7 @@ func (c *Client) RequestNoWait(command string, params map[string]string) ([]byte
 
 	queryURL := c.GenerateQueryURL(command, params)
 	log.Println("queryURL:", queryURL)
+	log.Println("request cookie:", c.HTTPClient.Jar)
 
 	req, _ := http.NewRequest("GET", queryURL, nil)
 	resp, err := c.HTTPClient.Do(req)
@@ -83,6 +84,7 @@ func (c *Client) RequestNoWait(command string, params map[string]string) ([]byte
 
 	response, err := ioutil.ReadAll(resp.Body)
 	log.Println("response:", string(response))
+	log.Println("response cookie:", c.HTTPClient.Jar)
 	if err != nil {
 		log.Println("ioutil.ReadAll failed:", err)
 		return response, err
@@ -93,6 +95,8 @@ func (c *Client) RequestNoWait(command string, params map[string]string) ([]byte
 		log.Println("takeContentFromAPIResponse failed:", err)
 		return nil, err
 	}
+	log.Println("content:", string(content))
+
 	return content, nil
 }
 
@@ -115,24 +119,35 @@ func (c *Client) GenerateQueryURL(command string, params map[string]string) stri
 			strings.ToLower(strings.Replace(queryStr, "+", "%20", -1))))
 		signature := base64.StdEncoding.EncodeToString(mac.Sum(nil))
 		signature = url.QueryEscape(signature)
-
+		path := c.EndPoint.Path
+		if !strings.HasPrefix(path, "/") {
+			path = "/" + path
+		}
 		queryURL = fmt.Sprintf(
-			"%s://%s/%s?%s&signature=%s",
-			c.EndPoint.Scheme, c.EndPoint.Host, c.EndPoint.Path,
+			"%s://%s%s?%s&signature=%s",
+			c.EndPoint.Scheme, c.EndPoint.Host, path,
 			queryStr, signature)
 	} else if command == "login" && c.Username != "" && c.Password != "" {
 		values.Add("username", c.Username)
 		values.Add("password", c.Password)
 		queryStr := values.Encode()
+		path := c.EndPoint.Path
+		if !strings.HasPrefix(path, "/") {
+			path = "/" + path
+		}
 		queryURL = fmt.Sprintf(
-			"%s://%s/%s?%s",
-			c.EndPoint.Scheme, c.EndPoint.Host, c.EndPoint.Path, queryStr)
+			"%s://%s%s?%s",
+			c.EndPoint.Scheme, c.EndPoint.Host, path, queryStr)
 	} else if c.SessionKey != "" {
 		values.Add("sessionkey", c.SessionKey)
 		queryStr := values.Encode()
+		path := c.EndPoint.Path
+		if !strings.HasPrefix(path, "/") {
+			path = "/" + path
+		}
 		queryURL = fmt.Sprintf(
-			"%s://%s/%s?%s",
-			c.EndPoint.Scheme, c.EndPoint.Host, c.EndPoint.Path, queryStr)
+			"%s://%s%s?%s",
+			c.EndPoint.Scheme, c.EndPoint.Host, path, queryStr)
 	} else {
 		log.Println("Failed to authenticate: You must provide apikey/secretkey or username/password")
 	}
