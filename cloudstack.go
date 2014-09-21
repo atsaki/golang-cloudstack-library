@@ -178,6 +178,10 @@ func (c *Client) LogIn() error {
 
 	params := map[string]string{}
 	b, err := c.RequestNoWait("login", params)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
 	lr := LogInResponse{}
 	err = json.Unmarshal(b, &lr)
@@ -225,6 +229,8 @@ func (c *Client) Request(command string, params map[string]string) ([]byte, erro
 	b, err := c.RequestNoWait(command, params)
 	if err != nil {
 		log.Println("RequestNoWait failed:", err)
+		log.Println("RequestNoWait returned:", string(b))
+		return b, err
 	}
 
 	if isAsync {
@@ -233,13 +239,13 @@ func (c *Client) Request(command string, params map[string]string) ([]byte, erro
 		err = json.Unmarshal(b, qr)
 		if err != nil {
 			log.Println("Unmarshal failed", err)
-			return nil, err
+			return b, err
 		}
 
 		qr, err = c.Wait(qr.Jobid.String)
 		if err != nil {
 			log.Println("Wait failed", err)
-			return nil, err
+			return qr.Jobresult, err
 		}
 
 		return qr.Jobresult, nil
@@ -274,8 +280,7 @@ func (c *Client) Wait(jobid string) (*QueryAsyncJobResultResponse, error) {
 	if qr.Jobstatus.Valid && qr.Jobstatus.Int64 == 1 {
 		return qr, nil
 	} else {
-		err := errors.New(fmt.Sprintf(
-			"queryAsyncJobResult finished with jobstatus != %v", qr.Jobstatus.Int64))
+		err := errors.New(string(qr.Jobresult))
 		log.Println(err)
 		log.Println(qr)
 		return qr, err
