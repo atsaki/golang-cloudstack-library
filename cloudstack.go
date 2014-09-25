@@ -76,8 +76,17 @@ func (c *Client) RequestNoWait(command string, params map[string]string) ([]byte
 
 	req, _ := http.NewRequest("GET", queryURL, nil)
 	resp, err := c.HTTPClient.Do(req)
+	log.Println("http response:", resp)
+
 	if err != nil {
 		log.Println("HTTPClient.Do failed:", err)
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		response, _ := ioutil.ReadAll(resp.Body)
+		err = errors.New(
+			fmt.Sprintf("StatusCode %d: %s", resp.StatusCode, response))
 		return nil, err
 	}
 	defer resp.Body.Close()
