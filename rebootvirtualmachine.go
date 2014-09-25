@@ -31,9 +31,14 @@ func (c *Client) RebootVirtualMachine(p RebootVirtualMachineParameter) (Virtualm
 	}
 	err = json.Unmarshal(b, &v)
 	if err != nil {
-		log.Println("json.Unmarshal failed:", err)
+		log.Println("failed:", err)
 	}
-	err = json.Unmarshal(v["virtualmachine"], &ret)
+	content, ok := v["virtualmachine"]
+	if !ok {
+		log.Println("Content is empty.")
+		return ret, nil
+	}
+	err = json.Unmarshal(content, &ret)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}

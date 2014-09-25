@@ -205,7 +205,12 @@ func (c *Client) ListPublicIpAddresses(p ListPublicIpAddressesParameter) ([]Publ
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
-	err = json.Unmarshal(v["publicipaddress"], &ret)
+	content, ok := v["publicipaddress"]
+	if !ok {
+		log.Println("Content is empty.")
+		return ret, nil
+	}
+	err = json.Unmarshal(content, &ret)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}

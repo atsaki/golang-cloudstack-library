@@ -213,7 +213,12 @@ func (c *Client) ListNetworks(p ListNetworksParameter) ([]Network, error) {
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
-	err = json.Unmarshal(v["network"], &ret)
+	content, ok := v["network"]
+	if !ok {
+		log.Println("Content is empty.")
+		return ret, nil
+	}
+	err = json.Unmarshal(content, &ret)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}

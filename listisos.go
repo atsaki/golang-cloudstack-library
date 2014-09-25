@@ -173,7 +173,12 @@ func (c *Client) ListIsos(p ListIsosParameter) ([]Iso, error) {
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
-	err = json.Unmarshal(v["iso"], &ret)
+	content, ok := v["iso"]
+	if !ok {
+		log.Println("Content is empty.")
+		return ret, nil
+	}
+	err = json.Unmarshal(content, &ret)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}

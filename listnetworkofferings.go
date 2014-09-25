@@ -185,7 +185,12 @@ func (c *Client) ListNetworkOfferings(p ListNetworkOfferingsParameter) ([]Networ
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
-	err = json.Unmarshal(v["networkoffering"], &ret)
+	content, ok := v["networkoffering"]
+	if !ok {
+		log.Println("Content is empty.")
+		return ret, nil
+	}
+	err = json.Unmarshal(content, &ret)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}

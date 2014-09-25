@@ -97,7 +97,12 @@ func (c *Client) ListServiceOfferings(p ListServiceOfferingsParameter) ([]Servic
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
-	err = json.Unmarshal(v["serviceoffering"], &ret)
+	content, ok := v["serviceoffering"]
+	if !ok {
+		log.Println("Content is empty.")
+		return ret, nil
+	}
+	err = json.Unmarshal(content, &ret)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}

@@ -109,7 +109,12 @@ func (c *Client) ListZones(p ListZonesParameter) ([]Zone, error) {
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
-	err = json.Unmarshal(v["zone"], &ret)
+	content, ok := v["zone"]
+	if !ok {
+		log.Println("Content is empty.")
+		return ret, nil
+	}
+	err = json.Unmarshal(content, &ret)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}

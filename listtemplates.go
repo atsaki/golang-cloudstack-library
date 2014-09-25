@@ -149,7 +149,12 @@ func (c *Client) ListTemplates(p ListTemplatesParameter) ([]Template, error) {
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
-	err = json.Unmarshal(v["template"], &ret)
+	content, ok := v["template"]
+	if !ok {
+		log.Println("Content is empty.")
+		return ret, nil
+	}
+	err = json.Unmarshal(content, &ret)
 	if err != nil {
 		log.Println("json.Unmarshal failed:", err)
 	}
