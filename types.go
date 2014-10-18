@@ -106,6 +106,14 @@ type ID struct {
 	NullString
 }
 
+func (id *ID) MarshalJSON() ([]byte, error) {
+	if id.Valid {
+		return json.Marshal(id.String)
+	} else {
+		return json.Marshal(nil)
+	}
+}
+
 func (id *ID) UnmarshalJSON(b []byte) (err error) {
 	var i interface{}
 	if err = json.Unmarshal(b, &i); err == nil {
