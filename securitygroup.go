@@ -1,20 +1,20 @@
 package cloudstack
 
 type Securitygroup struct {
-	Account     NullString    `json:"account"`
-	Description NullString    `json:"description"`
-	Domain      NullString    `json:"domain"`
-	Domainid    ID            `json:"domainid"`
-	Egressrule  []Egressrule  `json:"egressrule"`
-	Id          ID            `json:"id"`
-	Ingressrule []Ingressrule `json:"ingressrule"`
-	Name        NullString    `json:"name"`
-	Project     NullString    `json:"project"`
-	Projectid   ID            `json:"projectid"`
-	Tag         []Tag         `json:"tags"`
+	Account     NullString             `json:"account"`
+	Description NullString             `json:"description"`
+	Domain      NullString             `json:"domain"`
+	Domainid    ID                     `json:"domainid"`
+	Egressrule  []Securitygroupegress  `json:"egressrule"`
+	Id          ID                     `json:"id"`
+	Ingressrule []Securitygroupingress `json:"ingressrule"`
+	Name        NullString             `json:"name"`
+	Project     NullString             `json:"project"`
+	Projectid   ID                     `json:"projectid"`
+	Tag         []Tag                  `json:"tags"`
 }
 
-type Egressrule struct {
+type Securitygroupegress struct {
 	Account           NullString `json:"account"`
 	Cidr              NullString `json:"cidr"`
 	Endport           NullInt64  `json:"endport"`
@@ -26,7 +26,7 @@ type Egressrule struct {
 	Startport         NullInt64  `json:"startport"`
 }
 
-type Ingressrule struct {
+type Securitygroupingress struct {
 	Account           NullString `json:"account"`
 	Cidr              NullString `json:"cidr"`
 	Endport           NullInt64  `json:"endport"`
