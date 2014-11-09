@@ -95,7 +95,7 @@ func (c *Client) CreateFirewallRule(p CreateFirewallRuleParameter) (Firewallrule
 	}
 	err = json.Unmarshal(b, &v)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal: %s", string(b))
+		return ret, fmt.Errorf("Failed to unmarshal: %s", string(b))
 	}
 	content, ok := v["firewallrule"]
 	if !ok {
@@ -104,7 +104,7 @@ func (c *Client) CreateFirewallRule(p CreateFirewallRuleParameter) (Firewallrule
 	}
 	err = json.Unmarshal(content, &ret)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal: %s", string(content))
+		return ret, fmt.Errorf("Failed to unmarshal: %s", string(content))
 	}
 	return ret, nil
 }

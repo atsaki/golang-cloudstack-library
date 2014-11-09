@@ -16,16 +16,14 @@ import (
 	"time"
 )
 
-func takeContentFromAPIResponse(
-	command string, response []byte) ([]byte, error) {
+func takeContentFromAPIResponse(command string, response []byte) ([]byte, error) {
 	var v map[string]json.RawMessage
 	if err := json.Unmarshal(response, &v); err != nil {
-		log.Println("json.Unmarshal failed:", err)
-		return nil, err
+		return nil, fmt.Errorf("Failed to unmarshal: %s", string(response))
 	}
 	content, ok := v[strings.ToLower(command)+"response"]
 	if !ok {
-		return nil, errors.New("Unexpected Response format")
+		return nil, fmt.Errorf("Unexpected Response format: %s", string(response))
 	}
 	return content, nil
 }
@@ -195,8 +193,7 @@ func (c *Client) LogIn() error {
 	lr := LogInResponse{}
 	err = json.Unmarshal(b, &lr)
 	if err != nil {
-		log.Println("json.Unmarshal failed:", err)
-		return err
+		return fmt.Errorf("Failed to unmarshal: %s", string(b))
 	}
 
 	if !lr.Sessionkey.Valid {
@@ -215,13 +212,11 @@ func (c *Client) LogOut() error {
 	lr := LogOutResponse{}
 	err = json.Unmarshal(b, &lr)
 	if err != nil {
-		log.Println("json.Unmarshal failed:", err)
-		return err
+		return fmt.Errorf("Failed to unmarshal: %s", string(b))
 	}
 
 	if !lr.Description.Valid || lr.Description.String != "success" {
-		return errors.New(
-			fmt.Sprintf("logout API is failed. description: %v", lr.Description))
+		return fmt.Errorf("logout API is failed. description: %v", lr.Description)
 	}
 	return nil
 }
@@ -230,15 +225,11 @@ func (c *Client) Request(command string, params map[string]string) ([]byte, erro
 
 	isAsync, ok := isAsyncMap[command]
 	if !ok {
-		err := errors.New(fmt.Sprintf("%v : No such command", command))
-		log.Println(err)
-		return nil, err
+		return nil, fmt.Errorf("%v : No such command", command)
 	}
 
 	b, err := c.RequestNoWait(command, params)
 	if err != nil {
-		log.Println("RequestNoWait failed:", err)
-		log.Println("RequestNoWait returned:", string(b))
 		return b, err
 	}
 
@@ -247,38 +238,42 @@ func (c *Client) Request(command string, params map[string]string) ([]byte, erro
 
 		err = json.Unmarshal(b, qr)
 		if err != nil {
-			log.Println("Unmarshal failed", err)
-			return b, err
+			return b, fmt.Errorf("Failed to unmarshal: %s", string(b))
+		}
+
+		// if valid jobid is not returned, return errortext as error
+		if !qr.Jobid.Valid {
+			var v map[string]json.RawMessage
+			err = json.Unmarshal(b, &v)
+			if err != nil {
+				return b, fmt.Errorf("Failed to unmarshal: %s", string(b))
+			}
+			errortext, _ := v["errortext"]
+			return b, fmt.Errorf(string(errortext))
 		}
 
 		qr, err = c.Wait(qr.Jobid.String)
-		if err != nil {
-			log.Println("Wait failed", err)
-			return qr.Jobresult, err
-		}
-
-		return qr.Jobresult, nil
+		return qr.Jobresult, err
 	} else {
 		return b, nil
 	}
 }
 
 func (c *Client) Wait(jobid string) (*QueryAsyncJobResultResponse, error) {
-	params := map[string]string{
-		"jobid": jobid,
-	}
+
+	var b []byte
+	var err error
 	qr := new(QueryAsyncJobResultResponse)
 
 	for {
-		b, err := c.RequestNoWait("queryAsyncJobResult", params)
+		b, err = c.RequestNoWait(
+			"queryAsyncJobResult", map[string]string{"jobid": jobid})
 		if err != nil {
-			log.Println("Request failed", err)
-			return nil, err
+			return qr, err
 		}
 		err = json.Unmarshal(b, qr)
 		if err != nil {
-			log.Println("Unmarshal failed", err)
-			return nil, err
+			return qr, fmt.Errorf("Failed to unmarshal: %s", string(b))
 		}
 		if !(qr.Jobstatus.Valid && qr.Jobstatus.Int64 == 0) {
 			break
@@ -289,9 +284,16 @@ func (c *Client) Wait(jobid string) (*QueryAsyncJobResultResponse, error) {
 	if qr.Jobstatus.Valid && qr.Jobstatus.Int64 == 1 {
 		return qr, nil
 	} else {
-		err := errors.New(string(qr.Jobresult))
-		log.Println(err)
-		log.Println(qr)
-		return qr, err
+		if qr.Jobstatus.Valid {
+			return qr, fmt.Errorf(string(qr.Jobresult))
+		}
+
+		var v map[string]json.RawMessage
+		err = json.Unmarshal(b, &v)
+		if err != nil {
+			return qr, fmt.Errorf("Failed to unmarshal: %s", string(b))
+		}
+		errortext, _ := v["errortext"]
+		return qr, fmt.Errorf(string(errortext))
 	}
 }

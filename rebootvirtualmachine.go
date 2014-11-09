@@ -31,7 +31,7 @@ func (c *Client) RebootVirtualMachine(p RebootVirtualMachineParameter) (Virtualm
 	}
 	err = json.Unmarshal(b, &v)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal: %s", string(b))
+		return ret, fmt.Errorf("Failed to unmarshal: %s", string(b))
 	}
 	content, ok := v["virtualmachine"]
 	if !ok {
@@ -40,7 +40,7 @@ func (c *Client) RebootVirtualMachine(p RebootVirtualMachineParameter) (Virtualm
 	}
 	err = json.Unmarshal(content, &ret)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal: %s", string(content))
+		return ret, fmt.Errorf("Failed to unmarshal: %s", string(content))
 	}
 	return ret, nil
 }

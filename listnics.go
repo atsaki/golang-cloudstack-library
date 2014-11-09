@@ -79,7 +79,7 @@ func (c *Client) ListNics(p ListNicsParameter) ([]Nic, error) {
 	}
 	err = json.Unmarshal(b, &v)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal: %s", string(b))
+		return ret, fmt.Errorf("Failed to unmarshal: %s", string(b))
 	}
 	content, ok := v["nic"]
 	if !ok {
@@ -88,7 +88,7 @@ func (c *Client) ListNics(p ListNicsParameter) ([]Nic, error) {
 	}
 	err = json.Unmarshal(content, &ret)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal: %s", string(content))
+		return ret, fmt.Errorf("Failed to unmarshal: %s", string(content))
 	}
 	return ret, nil
 }
