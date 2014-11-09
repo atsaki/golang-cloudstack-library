@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 type NullBool struct {
@@ -19,15 +20,32 @@ func (nb *NullBool) MarshalJSON() ([]byte, error) {
 }
 
 func (nb *NullBool) UnmarshalJSON(b []byte) (err error) {
-	val := false
-	if err = json.Unmarshal(b, &val); err == nil {
-		nb.Bool = val
-		nb.Valid = true
-	} else {
-		nb.Bool = false
-		nb.Valid = false
+	var i interface{}
+	nb.Bool = false
+	nb.Valid = false
+
+	if err = json.Unmarshal(b, &i); err != nil {
+		return err
 	}
-	return err
+
+	switch v := i.(type) {
+	case bool:
+		nb.Bool = v
+		nb.Valid = true
+	case string:
+		v = strings.ToLower(v)
+		switch v {
+		case "true":
+			nb.Bool = true
+			nb.Valid = true
+		case "false":
+			nb.Bool = false
+			nb.Valid = true
+		default:
+			return fmt.Errorf("Can't convert to bool: %s", v)
+		}
+	}
+	return nil
 }
 
 type NullInt64 struct {
