@@ -135,6 +135,9 @@ func (c *Client) ListFirewallRules(p ListFirewallRulesParameter) ([]Firewallrule
 	}
 	content, ok := v["firewallrule"]
 	if !ok {
+		if len(v) == 0 {
+			return ret, nil
+		}
 		errortext, _ := v["errortext"]
 		return ret, fmt.Errorf(string(errortext))
 	}

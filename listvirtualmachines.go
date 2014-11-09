@@ -254,6 +254,9 @@ func (c *Client) ListVirtualMachines(p ListVirtualMachinesParameter) ([]Virtualm
 	}
 	content, ok := v["virtualmachine"]
 	if !ok {
+		if len(v) == 0 {
+			return ret, nil
+		}
 		errortext, _ := v["errortext"]
 		return ret, fmt.Errorf(string(errortext))
 	}

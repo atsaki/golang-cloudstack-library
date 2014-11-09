@@ -215,6 +215,9 @@ func (c *Client) ListNetworks(p ListNetworksParameter) ([]Network, error) {
 	}
 	content, ok := v["network"]
 	if !ok {
+		if len(v) == 0 {
+			return ret, nil
+		}
 		errortext, _ := v["errortext"]
 		return ret, fmt.Errorf(string(errortext))
 	}

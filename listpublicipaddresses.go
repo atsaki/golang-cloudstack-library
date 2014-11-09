@@ -207,6 +207,9 @@ func (c *Client) ListPublicIpAddresses(p ListPublicIpAddressesParameter) ([]Publ
 	}
 	content, ok := v["publicipaddress"]
 	if !ok {
+		if len(v) == 0 {
+			return ret, nil
+		}
 		errortext, _ := v["errortext"]
 		return ret, fmt.Errorf(string(errortext))
 	}

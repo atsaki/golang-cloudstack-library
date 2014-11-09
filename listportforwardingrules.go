@@ -135,6 +135,9 @@ func (c *Client) ListPortForwardingRules(p ListPortForwardingRulesParameter) ([]
 	}
 	content, ok := v["portforwardingrule"]
 	if !ok {
+		if len(v) == 0 {
+			return ret, nil
+		}
 		errortext, _ := v["errortext"]
 		return ret, fmt.Errorf(string(errortext))
 	}

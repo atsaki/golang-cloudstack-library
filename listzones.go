@@ -111,6 +111,9 @@ func (c *Client) ListZones(p ListZonesParameter) ([]Zone, error) {
 	}
 	content, ok := v["zone"]
 	if !ok {
+		if len(v) == 0 {
+			return ret, nil
+		}
 		errortext, _ := v["errortext"]
 		return ret, fmt.Errorf(string(errortext))
 	}

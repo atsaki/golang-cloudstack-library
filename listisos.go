@@ -175,6 +175,9 @@ func (c *Client) ListIsos(p ListIsosParameter) ([]Iso, error) {
 	}
 	content, ok := v["iso"]
 	if !ok {
+		if len(v) == 0 {
+			return ret, nil
+		}
 		errortext, _ := v["errortext"]
 		return ret, fmt.Errorf(string(errortext))
 	}

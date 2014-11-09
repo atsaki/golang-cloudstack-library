@@ -83,6 +83,9 @@ func (c *Client) ListNics(p ListNicsParameter) ([]Nic, error) {
 	}
 	content, ok := v["nic"]
 	if !ok {
+		if len(v) == 0 {
+			return ret, nil
+		}
 		errortext, _ := v["errortext"]
 		return ret, fmt.Errorf(string(errortext))
 	}

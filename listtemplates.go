@@ -151,6 +151,9 @@ func (c *Client) ListTemplates(p ListTemplatesParameter) ([]Template, error) {
 	}
 	content, ok := v["template"]
 	if !ok {
+		if len(v) == 0 {
+			return ret, nil
+		}
 		errortext, _ := v["errortext"]
 		return ret, fmt.Errorf(string(errortext))
 	}

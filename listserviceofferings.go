@@ -99,6 +99,9 @@ func (c *Client) ListServiceOfferings(p ListServiceOfferingsParameter) ([]Servic
 	}
 	content, ok := v["serviceoffering"]
 	if !ok {
+		if len(v) == 0 {
+			return ret, nil
+		}
 		errortext, _ := v["errortext"]
 		return ret, fmt.Errorf(string(errortext))
 	}
