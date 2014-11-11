@@ -125,10 +125,14 @@ func (c *Client) AuthorizeSecurityGroupEgress(p AuthorizeSecurityGroupEgressPara
 	if err != nil {
 		return ret, fmt.Errorf("Failed to unmarshal: %s", string(b))
 	}
-	content, ok := v["securitygroupegress"]
+	content, ok := v["securitygroup"]
 	if !ok {
-		errortext, _ := v["errortext"]
-		return ret, fmt.Errorf(string(errortext))
+		errortext, ok := v["errortext"]
+		if ok {
+			return ret, fmt.Errorf(string(errortext))
+		} else {
+			return ret, fmt.Errorf("Unexpected format")
+		}
 	}
 	err = json.Unmarshal(content, &ret)
 	if err != nil {

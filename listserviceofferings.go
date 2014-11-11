@@ -103,7 +103,11 @@ func (c *Client) ListServiceOfferings(p ListServiceOfferingsParameter) ([]Servic
 			return ret, nil
 		}
 		errortext, _ := v["errortext"]
-		return ret, fmt.Errorf(string(errortext))
+		if ok {
+			return ret, fmt.Errorf(string(errortext))
+		} else {
+			return ret, fmt.Errorf("Unexpected format")
+		}
 	}
 	err = json.Unmarshal(content, &ret)
 	if err != nil {
