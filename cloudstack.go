@@ -18,10 +18,20 @@ import (
 
 func takeContentFromAPIResponse(command string, response []byte) ([]byte, error) {
 	var v map[string]json.RawMessage
+	var content json.RawMessage
+	var ok bool
+
 	if err := json.Unmarshal(response, &v); err != nil {
 		return nil, fmt.Errorf("Failed to unmarshal: %s", string(response))
 	}
-	content, ok := v[strings.ToLower(command)+"response"]
+	switch strings.ToLower(command) {
+	case "revokesecuritygroupingress":
+		content, ok = v["revokesecuritygroupingress"]
+	case "revokesecuritygroupegress":
+		content, ok = v["revokesecuritygroupegress"]
+	default:
+		content, ok = v[strings.ToLower(command)+"response"]
+	}
 	if !ok {
 		return nil, fmt.Errorf("Unexpected Response format: %s", string(response))
 	}
