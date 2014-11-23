@@ -20,10 +20,10 @@ func main() {
 	username := "admin"
 	password := "password"
 
-	client, _ := cloudstack.NewClient(*endpoint, apikey, secretkey, username, password)
+	client, _ := cloudstack.NewClient(endpoint, apikey, secretkey, username, password)
 
-	params := cloudstack.ListZonesParameter{}
-	params.SetName("zone1")
+	params := cloudstack.NewListZonesParameter()
+	params.Name.Set("zone1")
 
 	zones, _ := client.ListZones(params)
 	b, _ := json.MarshalIndent(zones, "", "    ")
