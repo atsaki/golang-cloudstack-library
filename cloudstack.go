@@ -119,12 +119,12 @@ func (c *Client) Request(command string, params map[string]interface{}) (content
 
 	httpReq, _ := http.NewRequest("GET", queryURL, nil)
 	httpResp, err := c.HTTPClient.Do(httpReq)
-	defer httpResp.Body.Close()
 
 	if err != nil {
 		log.Println("HTTPClient.Do failed:", err)
 		return content, err
 	}
+	defer httpResp.Body.Close()
 
 	log.Println("statuscode:", httpResp.StatusCode)
 
