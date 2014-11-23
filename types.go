@@ -17,6 +17,25 @@ type Nullable interface {
 	IsNil() bool
 }
 
+type Setter interface {
+	Set(interface{}) error
+}
+
+func unmarshalJSON(s Setter, b []byte) error {
+	var v interface{}
+
+	// initialize by nil
+	if err := s.Set(nil); err != nil {
+		return err
+	}
+
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+
+	return s.Set(v)
+}
+
 // Base struct of Nullable
 type NullBase struct {
 	valid bool
@@ -31,18 +50,7 @@ func (n NullBase) MarshalJSON() ([]byte, error) {
 }
 
 func (nb *NullBase) UnmarshalJSON(b []byte) error {
-	var v interface{}
-
-	// initialize by nil
-	if err := nb.Set(nil); err != nil {
-		return err
-	}
-
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-
-	return nb.Set(v)
+	return unmarshalJSON(nb, b)
 }
 
 // Set value. If nil is given, value is cleared.
@@ -87,6 +95,10 @@ type NullBool struct {
 	NullBase
 }
 
+func (nb *NullBool) UnmarshalJSON(b []byte) error {
+	return unmarshalJSON(nb, b)
+}
+
 // Set Value. Value is converted by strconv.ParseBool
 func (nb *NullBool) Set(value interface{}) error {
 
@@ -118,6 +130,10 @@ type NullString struct {
 	NullBase
 }
 
+func (ns *NullString) UnmarshalJSON(b []byte) error {
+	return unmarshalJSON(ns, b)
+}
+
 // Set Value. Value is converted by fmt.Sprint
 func (ns *NullString) Set(value interface{}) error {
 
@@ -138,6 +154,10 @@ func (ns *NullString) Set(value interface{}) error {
 // Value is stored as string.
 type NullNumber struct {
 	NullString
+}
+
+func (nn *NullNumber) UnmarshalJSON(b []byte) error {
+	return unmarshalJSON(nn, b)
 }
 
 func (nn NullNumber) MarshalJSON() ([]byte, error) {
@@ -193,6 +213,10 @@ func (nn NullNumber) Float64() (float64, error) {
 // UUID or Integer ID
 type ID struct {
 	NullString
+}
+
+func (id *ID) UnmarshalJSON(b []byte) error {
+	return unmarshalJSON(id, b)
 }
 
 // Set Value

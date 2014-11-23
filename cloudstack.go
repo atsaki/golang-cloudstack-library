@@ -20,20 +20,11 @@ import (
 )
 
 // convert APIParameter to map[string]interface{}
-func convertParamToMap(p APIParameter) map[string]interface{} {
-	m := make(map[string]interface{})
+func convertParamToMap(p APIParameter) (m map[string]interface{}) {
+	m = make(map[string]interface{})
 	v := reflect.ValueOf(p).Elem()
-	t := v.Type()
 	for i := 0; i < v.NumField(); i++ {
-		fieldName := strings.ToLower(t.Field(i).Name)
-		switch val := v.Field(i).Interface().(type) {
-		case map[string]string:
-			continue
-		case NullBool, NullString, NullNumber, ID:
-			if !val.(Nullable).IsNil() {
-				m[fieldName] = val
-			}
-		}
+		m[strings.ToLower(v.Type().Field(i).Name)] = v.Field(i).Interface()
 	}
 	return m
 }
@@ -59,16 +50,21 @@ func getContent(command string, response []byte) (content []byte, err error) {
 }
 
 // Get error message from API response
-func getErrorText(b []byte) string {
+func getErrorText(b []byte) (errortext string) {
 	var v map[string]json.RawMessage
-	err := json.Unmarshal(b, &v)
+	var err error
+
+	if err = json.Unmarshal(b, &v); err != nil {
+		fmt.Errorf("Failed to unmarshal: %s", string(b))
+	}
+
 	quotedBytes, ok := v["errortext"]
 	if !ok {
 		return ""
 	}
 
 	quotedStr := string(quotedBytes)
-	errortext, err := strconv.Unquote(quotedStr)
+	errortext, err = strconv.Unquote(quotedStr)
 	if err != nil {
 		return quotedStr
 	}
@@ -76,7 +72,7 @@ func getErrorText(b []byte) string {
 }
 
 type Client struct {
-	EndPoint        url.URL
+	EndPoint        *url.URL
 	APIKey          string
 	SecretKey       string
 	Username        string
@@ -86,7 +82,7 @@ type Client struct {
 	HTTPClient      *http.Client
 }
 
-func NewClient(endpoint url.URL, apikey string, secretkey string,
+func NewClient(endpoint *url.URL, apikey string, secretkey string,
 	username string, password string) (*Client, error) {
 	jar, err := cookiejar.New(&cookiejar.Options{})
 	if err != nil {
@@ -104,14 +100,14 @@ func NewClient(endpoint url.URL, apikey string, secretkey string,
 	}, nil
 }
 
-func (c *Client) Request(command string, params map[string]interface{}) ([]byte, error) {
+func (c *Client) Request(command string, params map[string]interface{}) (content []byte, err error) {
 
 	if command != "login" && command != "logout" {
 		if (c.APIKey == "" || c.SecretKey == "") &&
 			(c.Username != "" && c.Password != "") {
-			if err := c.LogIn(); err != nil {
+			if err = c.LogIn(); err != nil {
 				log.Println("LogIn failed:", err)
-				return nil, err
+				return content, err
 			}
 			defer c.LogOut()
 		}
@@ -121,39 +117,34 @@ func (c *Client) Request(command string, params map[string]interface{}) ([]byte,
 	log.Println("QueryURL:", queryURL)
 	log.Println("request cookie:", c.HTTPClient.Jar)
 
-	req, _ := http.NewRequest("GET", queryURL, nil)
-	resp, err := c.HTTPClient.Do(req)
+	httpReq, _ := http.NewRequest("GET", queryURL, nil)
+	httpResp, err := c.HTTPClient.Do(httpReq)
+	defer httpResp.Body.Close()
 
 	if err != nil {
 		log.Println("HTTPClient.Do failed:", err)
-		return nil, err
+		return content, err
 	}
 
-	if resp.StatusCode != 200 {
-		response, _ := ioutil.ReadAll(resp.Body)
+	log.Println("statuscode:", httpResp.StatusCode)
+
+	if httpResp.StatusCode != 200 {
+		respBody, _ := ioutil.ReadAll(httpResp.Body)
 		err = errors.New(
-			fmt.Sprintf("StatusCode %d: %s", resp.StatusCode, response))
-		return nil, err
+			fmt.Sprintf("StatusCode %d: %s", httpResp.StatusCode, respBody))
+		return content, err
 	}
-	defer resp.Body.Close()
 
-	response, err := ioutil.ReadAll(resp.Body)
-
-	log.Println("statuscode:", resp.StatusCode)
-	log.Println("response:", string(response))
-	log.Println("cookie:", c.HTTPClient.Jar)
-
+	respBody, err := ioutil.ReadAll(httpResp.Body)
 	if err != nil {
 		log.Println("ioutil.ReadAll failed:", err)
-		return response, err
+		return content, err
 	}
 
-	content, err := getContent(command, response)
-	if err != nil {
-		return nil, err
-	}
+	log.Println("response:", string(respBody))
+	log.Println("cookie:", c.HTTPClient.Jar)
 
-	return content, nil
+	return getContent(command, respBody)
 }
 
 // Generate Query URL from command and paramters
@@ -164,8 +155,28 @@ func (c *Client) GenerateQueryURL(command string, params map[string]interface{})
 	values := url.Values{}
 	values.Add("command", command)
 	values.Add("response", "json")
-	for k, v := range params {
-		values.Add(k, fmt.Sprint(v))
+	for k := range params {
+		switch v := params[k].(type) {
+		case []string:
+			if len(v) > 0 {
+				values.Add(k, strings.Join(v, ","))
+			}
+		case map[string]string:
+			if len(v) > 0 {
+				i := 0
+				for key, value := range v {
+					values.Add(fmt.Sprintf("%s[%d].key", k, i), key)
+					values.Add(fmt.Sprintf("%s[%d].value", k, i), value)
+					i += 1
+				}
+			}
+		case NullBool, NullString, NullNumber, ID:
+			if !v.(Nullable).IsNil() {
+				values.Add(k, fmt.Sprint(v))
+			}
+		default:
+			values.Add(k, fmt.Sprint(v))
+		}
 	}
 
 	// values.Encode sort values by key
@@ -260,6 +271,8 @@ func getCommandNameFromParam(param APIParameter) string {
 // request executes SyncRequest and unmarshals response
 func (c *Client) request(param APIParameter, obj interface{}) error {
 	var v map[string]json.RawMessage
+	var content json.RawMessage
+	var ok bool
 
 	cmdName := getCommandNameFromParam(param)
 	cmd := config.Commands[cmdName]
@@ -269,28 +282,32 @@ func (c *Client) request(param APIParameter, obj interface{}) error {
 		return err
 	}
 
-	err = json.Unmarshal(resp, &v)
-	if err != nil {
-		return fmt.Errorf(
-			"Failed to unmarshal SyncRequest result (%s): %s", err, string(resp))
-	}
-
-	content, ok := v[cmd.Object]
-	if !ok {
-		if len(v) == 0 {
-			return nil
-		}
-		errortext, _ := v["errortext"]
-		if ok {
-			return fmt.Errorf(string(errortext))
-		} else {
+	if cmd.Object == "result" {
+		content = resp
+	} else {
+		err = json.Unmarshal(resp, &v)
+		if err != nil {
 			return fmt.Errorf(
-				"Unexpected SyncRequest response format: %s", string(resp))
+				"Failed to unmarshal SyncRequest result (%s): %s", err, string(resp))
+		}
+
+		content, ok = v[cmd.Object]
+		if !ok {
+			if len(v) == 0 {
+				return nil
+			}
+			errortext, _ := v["errortext"]
+			if ok {
+				return fmt.Errorf(string(errortext))
+			} else {
+				return fmt.Errorf(
+					"Unexpected SyncRequest response format: response doesn't contain '%s' or 'errortext' %s",
+					cmd.Object, string(resp))
+			}
 		}
 	}
 
-	err = json.Unmarshal(content, obj)
-	if err != nil {
+	if err = json.Unmarshal(content, obj); err != nil {
 		return fmt.Errorf(
 			"Failed to unmarshal content (%s): %s", err, string(content))
 	}
@@ -299,25 +316,20 @@ func (c *Client) request(param APIParameter, obj interface{}) error {
 }
 
 // SyncRequest executes command and wait for job complettion
-func (c *Client) SyncRequest(command string, params map[string]interface{}) ([]byte, error) {
+func (c *Client) SyncRequest(command string, params map[string]interface{}) (b []byte, err error) {
 
 	cmd, ok := config.Commands[command]
 	if !ok {
 		return nil, fmt.Errorf("%v : No such command", command)
 	}
 
-	b, err := c.Request(command, params)
-	if err != nil {
+	b, err = c.Request(command, params)
+	if !cmd.IsAsync || err != nil {
 		return b, err
 	}
 
-	if !cmd.IsAsync {
-		return b, nil
-	}
-
 	job := new(AsyncJobResult)
-	err = json.Unmarshal(b, job)
-	if err != nil {
+	if err = json.Unmarshal(b, job); err != nil {
 		return b, fmt.Errorf("Failed to unmarshal: %s", string(b))
 	}
 
