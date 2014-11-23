@@ -12,40 +12,78 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"reflect"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
 
-func takeContentFromAPIResponse(command string, response []byte) ([]byte, error) {
+// convert APIParameter to map[string]interface{}
+func convertParamToMap(p APIParameter) map[string]interface{} {
+	m := make(map[string]interface{})
+	v := reflect.ValueOf(p).Elem()
+	t := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		fieldName := strings.ToLower(t.Field(i).Name)
+		switch val := v.Field(i).Interface().(type) {
+		case map[string]string:
+			continue
+		case NullBool, NullString, NullNumber, ID:
+			if !val.(Nullable).IsNil() {
+				m[fieldName] = val
+			}
+		}
+	}
+	return m
+}
+
+// Get content from API response
+func getContent(command string, response []byte) (content []byte, err error) {
 	var v map[string]json.RawMessage
-	var content json.RawMessage
 	var ok bool
 
 	if err := json.Unmarshal(response, &v); err != nil {
 		return nil, fmt.Errorf("Failed to unmarshal: %s", string(response))
 	}
-	switch strings.ToLower(command) {
-	case "revokesecuritygroupingress":
-		content, ok = v["revokesecuritygroupingress"]
-	case "revokesecuritygroupegress":
-		content, ok = v["revokesecuritygroupegress"]
-	default:
-		content, ok = v[strings.ToLower(command)+"response"]
+
+	command = strings.ToLower(command)
+	content, ok = v[command+"response"]
+	if !ok {
+		content, ok = v[command]
 	}
 	if !ok {
-		return nil, fmt.Errorf("Unexpected Response format: %s", string(response))
+		return nil, fmt.Errorf("Failed to get content: %s", string(response))
 	}
 	return content, nil
 }
 
+// Get error message from API response
+func getErrorText(b []byte) string {
+	var v map[string]json.RawMessage
+	err := json.Unmarshal(b, &v)
+	quotedBytes, ok := v["errortext"]
+	if !ok {
+		return ""
+	}
+
+	quotedStr := string(quotedBytes)
+	errortext, err := strconv.Unquote(quotedStr)
+	if err != nil {
+		return quotedStr
+	}
+	return errortext
+}
+
 type Client struct {
-	EndPoint   url.URL
-	APIKey     string
-	SecretKey  string
-	Username   string
-	Password   string
-	SessionKey string
-	HTTPClient *http.Client
+	EndPoint        url.URL
+	APIKey          string
+	SecretKey       string
+	Username        string
+	Password        string
+	SessionKey      string
+	PollingInterval time.Duration
+	HTTPClient      *http.Client
 }
 
 func NewClient(endpoint url.URL, apikey string, secretkey string,
@@ -55,17 +93,18 @@ func NewClient(endpoint url.URL, apikey string, secretkey string,
 		log.Println("cookiejar.New failed:", err)
 	}
 	return &Client{
-		EndPoint:   endpoint,
-		APIKey:     apikey,
-		SecretKey:  secretkey,
-		Username:   username,
-		Password:   password,
-		SessionKey: "",
-		HTTPClient: &http.Client{Jar: jar},
+		EndPoint:        endpoint,
+		APIKey:          apikey,
+		SecretKey:       secretkey,
+		Username:        username,
+		Password:        password,
+		SessionKey:      "",
+		PollingInterval: config.PollingInterval,
+		HTTPClient:      &http.Client{Jar: jar},
 	}, nil
 }
 
-func (c *Client) RequestNoWait(command string, params map[string]string) ([]byte, error) {
+func (c *Client) Request(command string, params map[string]interface{}) ([]byte, error) {
 
 	if command != "login" && command != "logout" {
 		if (c.APIKey == "" || c.SecretKey == "") &&
@@ -79,12 +118,11 @@ func (c *Client) RequestNoWait(command string, params map[string]string) ([]byte
 	}
 
 	queryURL := c.GenerateQueryURL(command, params)
-	log.Println("queryURL:", queryURL)
+	log.Println("QueryURL:", queryURL)
 	log.Println("request cookie:", c.HTTPClient.Jar)
 
 	req, _ := http.NewRequest("GET", queryURL, nil)
 	resp, err := c.HTTPClient.Do(req)
-	log.Println("http response:", resp)
 
 	if err != nil {
 		log.Println("HTTPClient.Do failed:", err)
@@ -100,91 +138,71 @@ func (c *Client) RequestNoWait(command string, params map[string]string) ([]byte
 	defer resp.Body.Close()
 
 	response, err := ioutil.ReadAll(resp.Body)
+
+	log.Println("statuscode:", resp.StatusCode)
 	log.Println("response:", string(response))
-	log.Println("response cookie:", c.HTTPClient.Jar)
+	log.Println("cookie:", c.HTTPClient.Jar)
+
 	if err != nil {
 		log.Println("ioutil.ReadAll failed:", err)
 		return response, err
 	}
 
-	content, err := takeContentFromAPIResponse(command, response)
+	content, err := getContent(command, response)
 	if err != nil {
-		log.Println("takeContentFromAPIResponse failed:", err)
 		return nil, err
 	}
-	log.Println("content:", string(content))
 
 	return content, nil
 }
 
-func (c *Client) GenerateQueryURL(command string, params map[string]string) string {
+// Generate Query URL from command and paramters
+func (c *Client) GenerateQueryURL(command string, params map[string]interface{}) string {
 
-	var queryURL string
+	queryURL := c.EndPoint
+
 	values := url.Values{}
 	values.Add("command", command)
 	values.Add("response", "json")
 	for k, v := range params {
-		values.Add(k, v)
+		values.Add(k, fmt.Sprint(v))
 	}
 
+	// values.Encode sort values by key
 	if c.APIKey != "" && c.SecretKey != "" {
 		values.Add("apikey", c.APIKey)
 		queryStr := values.Encode()
-
 		mac := hmac.New(sha1.New, []byte(c.SecretKey))
 		mac.Write([]byte(
 			strings.ToLower(strings.Replace(queryStr, "+", "%20", -1))))
 		signature := base64.StdEncoding.EncodeToString(mac.Sum(nil))
 		signature = url.QueryEscape(signature)
-		path := c.EndPoint.Path
-		if !strings.HasPrefix(path, "/") {
-			path = "/" + path
-		}
-		queryURL = fmt.Sprintf(
-			"%s://%s%s?%s&signature=%s",
-			c.EndPoint.Scheme, c.EndPoint.Host, path,
-			queryStr, signature)
-	} else if command == "login" && c.Username != "" && c.Password != "" {
-		values.Add("username", c.Username)
-		values.Add("password", c.Password)
-		queryStr := values.Encode()
-		path := c.EndPoint.Path
-		if !strings.HasPrefix(path, "/") {
-			path = "/" + path
-		}
-		queryURL = fmt.Sprintf(
-			"%s://%s%s?%s",
-			c.EndPoint.Scheme, c.EndPoint.Host, path, queryStr)
-	} else if c.SessionKey != "" {
-		values.Add("sessionkey", c.SessionKey)
-		queryStr := values.Encode()
-		path := c.EndPoint.Path
-		if !strings.HasPrefix(path, "/") {
-			path = "/" + path
-		}
-		queryURL = fmt.Sprintf(
-			"%s://%s%s?%s",
-			c.EndPoint.Scheme, c.EndPoint.Host, path, queryStr)
+		queryURL.RawQuery = queryStr + "&signature=" + signature
 	} else {
-		log.Println("Failed to authenticate: You must provide apikey/secretkey or username/password")
+		if command == "login" && c.Username != "" && c.Password != "" {
+			values.Add("username", c.Username)
+			values.Add("password", c.Password)
+		} else if c.SessionKey != "" {
+			values.Add("sessionkey", c.SessionKey)
+		}
+		queryURL.RawQuery = values.Encode()
 	}
-
-	return queryURL
+	return queryURL.String()
 }
 
 type LogInResponse struct {
 	Username       NullString `json:"username"`
-	Userid         ID         `json:"userid"`
+	UserId         NullString `json:"userid"`
 	Password       NullString `json:"password"`
-	Domainid       ID         `json:"domainid"`
+	DomainId       NullString `json:"domainid"`
 	Timeout        NullString `json:"timeout"`
 	Account        NullString `json:"account"`
-	Firstname      NullString `json:"firstname"`
-	Lastname       NullString `json:"lastname"`
+	FirstName      NullString `json:"firstname"`
+	LastName       NullString `json:"lastname"`
 	Type           NullString `json:"type"`
-	Timezone       NullString `json:"timezone"`
-	Timezoneoffset NullString `json:"timezoneoffset"`
-	Sessionkey     NullString `json:"sessionkey"`
+	TimeZone       NullString `json:"timezone"`
+	TimeZoneOffset NullString `json:"timezoneoffset"`
+	SessionKey     NullString `json:"sessionkey"`
 }
 
 type LogOutResponse struct {
@@ -193,117 +211,144 @@ type LogOutResponse struct {
 
 func (c *Client) LogIn() error {
 
-	params := map[string]string{}
-	b, err := c.RequestNoWait("login", params)
+	var params map[string]interface{}
+	b, err := c.Request("login", params)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	lr := LogInResponse{}
-	err = json.Unmarshal(b, &lr)
+	r := LogInResponse{}
+	err = json.Unmarshal(b, &r)
 	if err != nil {
 		return fmt.Errorf("Failed to unmarshal: %s", string(b))
 	}
 
-	if !lr.Sessionkey.Valid {
+	if r.SessionKey.IsNil() {
 		return errors.New("login API didn't return valid sessionkey.")
 	}
 
-	c.SessionKey = lr.Sessionkey.String
+	c.SessionKey = r.SessionKey.String()
 	return nil
 }
 
 func (c *Client) LogOut() error {
 
-	params := map[string]string{}
-	b, err := c.RequestNoWait("logout", params)
+	var params map[string]interface{}
+	b, err := c.Request("logout", params)
 
-	lr := LogOutResponse{}
-	err = json.Unmarshal(b, &lr)
+	r := LogOutResponse{}
+	err = json.Unmarshal(b, &r)
 	if err != nil {
 		return fmt.Errorf("Failed to unmarshal: %s", string(b))
 	}
 
-	if !lr.Description.Valid || lr.Description.String != "success" {
-		return fmt.Errorf("logout API is failed. description: %v", lr.Description)
+	if r.Description.IsNil() || r.Description.String() != "success" {
+		return fmt.Errorf("logout API is failed. description: %v", r.Description)
 	}
 	return nil
 }
 
-func (c *Client) Request(command string, params map[string]string) ([]byte, error) {
+// Get API command from Parameter (ex. ListZonesParameter -> listZones)
+func getCommandNameFromParam(param APIParameter) string {
+	paramName := reflect.TypeOf(param).Elem().Name()
+	paramName = strings.ToLower(paramName[0:1]) + paramName[1:]
+	re := regexp.MustCompile("(.*\\.)?([^.]+)Parameter$")
+	return re.ReplaceAllString(paramName, "$2")
+}
 
-	isAsync, ok := isAsyncMap[command]
+// request executes SyncRequest and unmarshals response
+func (c *Client) request(param APIParameter, obj interface{}) error {
+	var v map[string]json.RawMessage
+
+	cmdName := getCommandNameFromParam(param)
+	cmd := config.Commands[cmdName]
+
+	resp, err := c.SyncRequest(cmdName, convertParamToMap(param))
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(resp, &v)
+	if err != nil {
+		return fmt.Errorf(
+			"Failed to unmarshal SyncRequest result (%s): %s", err, string(resp))
+	}
+
+	content, ok := v[cmd.Object]
+	if !ok {
+		if len(v) == 0 {
+			return nil
+		}
+		errortext, _ := v["errortext"]
+		if ok {
+			return fmt.Errorf(string(errortext))
+		} else {
+			return fmt.Errorf(
+				"Unexpected SyncRequest response format: %s", string(resp))
+		}
+	}
+
+	err = json.Unmarshal(content, obj)
+	if err != nil {
+		return fmt.Errorf(
+			"Failed to unmarshal content (%s): %s", err, string(content))
+	}
+
+	return nil
+}
+
+// SyncRequest executes command and wait for job complettion
+func (c *Client) SyncRequest(command string, params map[string]interface{}) ([]byte, error) {
+
+	cmd, ok := config.Commands[command]
 	if !ok {
 		return nil, fmt.Errorf("%v : No such command", command)
 	}
 
-	b, err := c.RequestNoWait(command, params)
+	b, err := c.Request(command, params)
 	if err != nil {
 		return b, err
 	}
 
-	if isAsync {
-		qr := new(QueryAsyncJobResultResponse)
-
-		err = json.Unmarshal(b, qr)
-		if err != nil {
-			return b, fmt.Errorf("Failed to unmarshal: %s", string(b))
-		}
-
-		// if valid jobid is not returned, return errortext as error
-		if !qr.Jobid.Valid {
-			var v map[string]json.RawMessage
-			err = json.Unmarshal(b, &v)
-			if err != nil {
-				return b, fmt.Errorf("Failed to unmarshal: %s", string(b))
-			}
-			errortext, _ := v["errortext"]
-			return b, fmt.Errorf(string(errortext))
-		}
-
-		qr, err = c.Wait(qr.Jobid.String)
-		return qr.Jobresult, err
-	} else {
+	if !cmd.IsAsync {
 		return b, nil
 	}
+
+	job := new(AsyncJobResult)
+	err = json.Unmarshal(b, job)
+	if err != nil {
+		return b, fmt.Errorf("Failed to unmarshal: %s", string(b))
+	}
+
+	if job.JobId.IsNil() {
+		return b, errors.New(getErrorText(b))
+	}
+
+	job, err = c.Wait(job.JobId.String())
+	if job == nil || err != nil {
+		return nil, err
+	}
+	return job.JobResult, nil
 }
 
-func (c *Client) Wait(jobid string) (*QueryAsyncJobResultResponse, error) {
+// Wait waits for job completion
+func (c *Client) Wait(jobid string) (job *AsyncJobResult, err error) {
 
-	var b []byte
-	var err error
-	qr := new(QueryAsyncJobResultResponse)
+	p := new(QueryAsyncJobResultParameter)
+	p.JobId.Set(jobid)
 
 	for {
-		b, err = c.RequestNoWait(
-			"queryAsyncJobResult", map[string]string{"jobid": jobid})
+		job, err = c.QueryAsyncJobResult(p)
 		if err != nil {
-			return qr, err
+			return job, err
 		}
-		err = json.Unmarshal(b, qr)
-		if err != nil {
-			return qr, fmt.Errorf("Failed to unmarshal: %s", string(b))
-		}
-		if !(qr.Jobstatus.Valid && qr.Jobstatus.Int64 == 0) {
+
+		if job.JobStatus.IsNil() || job.JobStatus.String() != "0" {
 			break
 		}
-		time.Sleep(waitInterval * time.Second)
+		time.Sleep(c.PollingInterval * time.Second)
 	}
 
-	if qr.Jobstatus.Valid && qr.Jobstatus.Int64 == 1 {
-		return qr, nil
-	} else {
-		if qr.Jobstatus.Valid {
-			return qr, fmt.Errorf(string(qr.Jobresult))
-		}
-
-		var v map[string]json.RawMessage
-		err = json.Unmarshal(b, &v)
-		if err != nil {
-			return qr, fmt.Errorf("Failed to unmarshal: %s", string(b))
-		}
-		errortext, _ := v["errortext"]
-		return qr, fmt.Errorf(string(errortext))
-	}
+	return job, err
 }

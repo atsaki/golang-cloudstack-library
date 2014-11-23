@@ -1,150 +1,222 @@
 package cloudstack
 
 import (
-	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"strings"
+	"strconv"
+
+	"code.google.com/p/go-uuid/uuid"
 )
 
-type NullBool struct {
-	sql.NullBool
+type APIParameter interface{}
+
+type Nullable interface {
+	Value() interface{}
+	String() string
+	IsNil() bool
 }
 
-func (nb *NullBool) MarshalJSON() ([]byte, error) {
-	if nb.Valid {
-		return json.Marshal(nb.Bool)
-	} else {
+// Base struct of Nullable
+type NullBase struct {
+	valid bool
+	value interface{}
+}
+
+func (n NullBase) MarshalJSON() ([]byte, error) {
+	if n.IsNil() {
 		return json.Marshal(nil)
 	}
+	return json.Marshal(n.value)
 }
 
-func (nb *NullBool) UnmarshalJSON(b []byte) (err error) {
-	var i interface{}
-	nb.Bool = false
-	nb.Valid = false
+func (nb *NullBase) UnmarshalJSON(b []byte) error {
+	var v interface{}
 
-	if err = json.Unmarshal(b, &i); err != nil {
+	// initialize by nil
+	if err := nb.Set(nil); err != nil {
 		return err
 	}
 
-	switch v := i.(type) {
-	case bool:
-		nb.Bool = v
-		nb.Valid = true
-	case string:
-		v = strings.ToLower(v)
-		switch v {
-		case "true":
-			nb.Bool = true
-			nb.Valid = true
-		case "false":
-			nb.Bool = false
-			nb.Valid = true
-		default:
-			return fmt.Errorf("Can't convert to bool: %s", v)
-		}
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
 	}
+
+	return nb.Set(v)
+}
+
+// Set value. If nil is given, value is cleared.
+func (nb *NullBase) Set(value interface{}) error {
+
+	nb.valid = false
+	nb.value = nil
+
+	if value == nil {
+		return nil
+	}
+
+	nb.valid = true
+	nb.value = value
+
 	return nil
 }
 
-type NullInt64 struct {
-	sql.NullInt64
-}
-
-func (ni *NullInt64) MarshalJSON() ([]byte, error) {
-	if ni.Valid {
-		return json.Marshal(ni.Int64)
-	} else {
-		return json.Marshal(nil)
+// Return Value. If no value is set, return nil.
+func (nb NullBase) Value() interface{} {
+	if nb.IsNil() {
+		return nil
 	}
+	return nb.value
 }
 
-func (ni *NullInt64) UnmarshalJSON(b []byte) (err error) {
-	val := int64(0)
-	if err = json.Unmarshal(b, &val); err == nil {
-		ni.Int64 = val
-		ni.Valid = true
-	} else {
-		ni.Int64 = 0
-		ni.Valid = false
+// Return Value as String. If no value is set, return "null".
+func (nb NullBase) String() string {
+	if nb.IsNil() {
+		return "null"
 	}
-	return err
+	return fmt.Sprint(nb.value)
 }
 
-type NullFloat64 struct {
-	sql.NullFloat64
+// Check if value is nil.
+func (nb NullBase) IsNil() bool {
+	return !nb.valid
 }
 
-func (nf *NullFloat64) MarshalJSON() ([]byte, error) {
-	if nf.Valid {
-		return json.Marshal(nf.Float64)
-	} else {
-		return json.Marshal(nil)
+// Nullable Bool
+type NullBool struct {
+	NullBase
+}
+
+// Set Value. Value is converted by strconv.ParseBool
+func (nb *NullBool) Set(value interface{}) error {
+
+	nb.valid = false
+	nb.value = false
+
+	if value == nil {
+		return nil
 	}
-}
 
-func (nf *NullFloat64) UnmarshalJSON(b []byte) (err error) {
-	val := float64(0)
-	if err = json.Unmarshal(b, &val); err == nil {
-		nf.Float64 = val
-		nf.Valid = true
-	} else {
-		nf.Float64 = 0
-		nf.Valid = false
+	b, err := strconv.ParseBool(fmt.Sprint(value))
+	if err != nil {
+		return err
 	}
-	return err
+
+	nb.valid = true
+	nb.value = b
+
+	return nil
 }
 
+// Return Value as bool
+func (nb NullBool) Bool() bool {
+	return nb.value.(bool)
+}
+
+// Nullable String
 type NullString struct {
-	sql.NullString
+	NullBase
 }
 
-func (ns *NullString) MarshalJSON() ([]byte, error) {
-	if ns.Valid {
-		return json.Marshal(ns.String)
-	} else {
-		return json.Marshal(nil)
+// Set Value. Value is converted by fmt.Sprint
+func (ns *NullString) Set(value interface{}) error {
+
+	ns.valid = false
+	ns.value = ""
+
+	if value == nil {
+		return nil
 	}
+
+	ns.valid = true
+	ns.value = fmt.Sprint(value)
+
+	return nil
 }
 
-func (ns *NullString) UnmarshalJSON(b []byte) (err error) {
-	var s interface{}
-	if err = json.Unmarshal(b, &s); err == nil {
-		ns.String = fmt.Sprint(s)
-		ns.Valid = true
-	} else {
-		ns.String = ""
-		ns.Valid = false
+// Nullable Number
+// Value is stored as string.
+type NullNumber struct {
+	NullString
+}
+
+func (nn NullNumber) MarshalJSON() ([]byte, error) {
+	return []byte(nn.String()), nil
+}
+
+// Set Value. Value is converted to string by fmt.Sprint
+func (nn *NullNumber) Set(value interface{}) error {
+
+	nn.valid = false
+	nn.value = ""
+
+	if value == nil {
+		return nil
 	}
-	return err
+
+	s := fmt.Sprint(value)
+	_, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return err
+	}
+
+	nn.valid = true
+	nn.value = s
+
+	return nil
 }
 
+// Return Value as int64
+func (nn NullNumber) Int64() (int64, error) {
+	if nn.IsNil() {
+		return 0, errors.New("NullNumber is nil")
+	}
+	return strconv.ParseInt(nn.value.(string), 10, 64)
+}
+
+// Return Value as uint64
+func (nn NullNumber) UInt64() (uint64, error) {
+	if nn.IsNil() {
+		return 0, errors.New("NullNumber is nil")
+	}
+	return strconv.ParseUint(nn.value.(string), 10, 64)
+}
+
+// Return Value as float64
+func (nn NullNumber) Float64() (float64, error) {
+	if nn.IsNil() {
+		return 0, errors.New("NullNumber is nil")
+	}
+	return strconv.ParseFloat(nn.value.(string), 64)
+}
+
+// UUID or Integer ID
 type ID struct {
 	NullString
 }
 
-func (id *ID) MarshalJSON() ([]byte, error) {
-	if id.Valid {
-		return json.Marshal(id.String)
-	} else {
-		return json.Marshal(nil)
+// Set Value
+func (id *ID) Set(value interface{}) error {
+
+	id.valid = false
+	id.value = ""
+
+	if value == nil {
+		return nil
 	}
+
+	s := fmt.Sprint(value)
+	uuid := uuid.Parse(s)
+	_, err := strconv.ParseFloat(s, 64)
+
+	if uuid != nil || err == nil {
+		id.valid = true
+		id.value = s
+	}
+
+	return nil
 }
 
-func (id *ID) UnmarshalJSON(b []byte) (err error) {
-	var i interface{}
-	if err = json.Unmarshal(b, &i); err == nil {
-		switch v := i.(type) {
-		case float64:
-			id.String = fmt.Sprint(uint64(v))
-		default:
-			id.String = fmt.Sprint(v)
-		}
-		id.Valid = true
-	} else {
-		id.String = ""
-		id.Valid = false
-	}
-	return err
+func (id ID) UUID() uuid.UUID {
+	return uuid.Parse(id.String())
 }
