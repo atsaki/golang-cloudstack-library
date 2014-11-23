@@ -1,6 +1,8 @@
 golang-cloudstack-library
 =========================
 
+[![Build Status](https://travis-ci.org/atsaki/golang-cloudstack-library.svg?branch=master)](https://travis-ci.org/atsaki/golang-cloudstack-library)
+
 Go language library for CloudStack API
 
 Installation
@@ -36,10 +38,10 @@ func main() {
 	username := "admin"
 	password := "password"
 
-	client, _ := cloudstack.NewClient(*endpoint, apikey, secretkey, username, password)
+	client, _ := cloudstack.NewClient(endpoint, apikey, secretkey, username, password)
 
-	params := cloudstack.ListZonesParameter{}
-	params.SetName("zone1")
+	params := cloudstack.NewListZonesParameter()
+	params.Name.Set("zone1")
 
 	zones, _ := client.ListZones(params)
 	b, _ := json.MarshalIndent(zones, "", "    ")
@@ -86,6 +88,8 @@ Count: 1
 Projects Using This Library
 ===========================
 
+* terraform-cloudstack-provider
+  * https://github.com/atsaki/terraform-provider-cloudstack
 * lockgate
   * https://github.com/atsaki/lockgate
 
