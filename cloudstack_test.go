@@ -6,8 +6,6 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
-
-	"github.com/atsaki/golang-cloudstack-library"
 )
 
 func TestKeyAuthentication(t *testing.T) {
@@ -17,7 +15,7 @@ func TestKeyAuthentication(t *testing.T) {
 	defer server.Close()
 
 	endpoint, _ := url.Parse(server.URL)
-	client, _ := cloudstack.NewClient(endpoint, "APIKEY", "SECRETKEY", "", "")
+	client, _ := NewClient(endpoint, "APIKEY", "SECRETKEY", "", "")
 	client.Request("listZones", map[string]interface{}{})
 }
 
@@ -28,6 +26,6 @@ func TestPasswordAuthentication(t *testing.T) {
 	defer server.Close()
 
 	endpoint, _ := url.Parse(server.URL)
-	client, _ := cloudstack.NewClient(endpoint, "", "", "admin", "password")
+	client, _ := NewClient(endpoint, "", "", "admin", "password")
 	client.Request("listZones", map[string]interface{}{})
 }

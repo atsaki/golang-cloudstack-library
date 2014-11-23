@@ -6,8 +6,6 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
-
-	"github.com/atsaki/golang-cloudstack-library"
 )
 
 func TestListZones(t *testing.T) {
@@ -37,8 +35,8 @@ func TestListZones(t *testing.T) {
 	defer server.Close()
 
 	endpoint, _ := url.Parse(server.URL)
-	client, _ := cloudstack.NewClient(endpoint, "APIKEY", "SECRETKEY", "", "")
-	p := cloudstack.NewListZonesParameter()
+	client, _ := NewClient(endpoint, "APIKEY", "SECRETKEY", "", "")
+	p := NewListZonesParameter()
 	zones, _ := client.ListZones(p)
 
 	if len(zones) != 1 {

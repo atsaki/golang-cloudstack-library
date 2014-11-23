@@ -2,13 +2,11 @@ package cloudstack
 
 import (
 	"testing"
-
-	"github.com/atsaki/golang-cloudstack-library"
 )
 
 func testNullBool(t *testing.T, v interface{}, expected bool) error {
 
-	nb := new(cloudstack.NullBool)
+	nb := new(NullBool)
 
 	if err := nb.Set(v); err != nil {
 		return err
@@ -36,7 +34,7 @@ func TestNullBool(t *testing.T) {
 
 func testNullString(t *testing.T, v interface{}, expected string) error {
 
-	ns := new(cloudstack.NullString)
+	ns := new(NullString)
 
 	if err := ns.Set(v); err != nil {
 		return err
@@ -61,7 +59,7 @@ func TestNullString(t *testing.T) {
 
 func testNullNumber(t *testing.T, v interface{}, expected string) error {
 
-	nn := new(cloudstack.NullNumber)
+	nn := new(NullNumber)
 
 	if err := nn.Set(v); err != nil {
 		return err
