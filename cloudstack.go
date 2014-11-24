@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
 
 // convert APIParameter to map[string]interface{}
@@ -24,7 +25,9 @@ func convertParamToMap(p APIParameter) (m map[string]interface{}) {
 	m = make(map[string]interface{})
 	v := reflect.ValueOf(p).Elem()
 	for i := 0; i < v.NumField(); i++ {
-		m[strings.ToLower(v.Type().Field(i).Name)] = v.Field(i).Interface()
+		if unicode.IsUpper(rune(v.Type().Field(i).Name[0])) {
+			m[strings.ToLower(v.Type().Field(i).Name)] = v.Field(i).Interface()
+		}
 	}
 	return m
 }

@@ -19,13 +19,13 @@ func TestKeyAuthentication(t *testing.T) {
 	client.Request("listZones", map[string]interface{}{})
 }
 
-func TestPasswordAuthentication(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "")
-	}))
-	defer server.Close()
-
-	endpoint, _ := url.Parse(server.URL)
-	client, _ := NewClient(endpoint, "", "", "admin", "password")
-	client.Request("listZones", map[string]interface{}{})
-}
+// func TestPasswordAuthentication(t *testing.T) {
+// 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		fmt.Fprintln(w, "")
+// 	}))
+// 	defer server.Close()
+//
+// 	endpoint, _ := url.Parse(server.URL)
+// 	client, _ := NewClient(endpoint, "", "", "admin", "password")
+// 	client.Request("listZones", map[string]interface{}{})
+// }

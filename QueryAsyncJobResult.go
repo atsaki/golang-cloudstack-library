@@ -39,14 +39,24 @@ func (c *Client) QueryAsyncJobResult(p *QueryAsyncJobResultParameter) (job *Asyn
 		return job, fmt.Errorf("Failed to unmarshal (%s): %s", err, string(b))
 	}
 
-	if !job.JobStatus.IsNil() &&
-		(job.JobStatus.String() == "0" || job.JobStatus.String() == "1") {
-		return job, nil
+	if job.JobStatus.IsNil() ||
+		(job.JobStatus.String() != "0" && job.JobStatus.String() != "1") {
+
+		var errortext string
+
+		errortext = getErrorText(b)
+		if errortext != "" {
+			return job, errors.New(errortext)
+		}
+
+		errortext = getErrorText(job.JobResult)
+		if errortext != "" {
+			return job, errors.New(errortext)
+		}
+
+		return job, fmt.Errorf(
+			"QueryAsyncJobResult didn't finished correctly : jobstatus: %v", job.JobStatus)
 	}
 
-	errortext := getErrorText(b)
-	if errortext != "" {
-		return job, errors.New(errortext)
-	}
-	return job, fmt.Errorf("QueryAsyncJobResult didn't finished correctly : jobstatus: %v", job.JobStatus)
+	return job, nil
 }
