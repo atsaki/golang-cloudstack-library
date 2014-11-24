@@ -1,6 +1,7 @@
 package cloudstack
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -29,7 +30,9 @@ func unmarshalJSON(s Setter, b []byte) error {
 		return err
 	}
 
-	if err := json.Unmarshal(b, &v); err != nil {
+	decoder := json.NewDecoder(bytes.NewReader(b))
+	decoder.UseNumber()
+	if err := decoder.Decode(&v); err != nil {
 		return err
 	}
 
