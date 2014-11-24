@@ -273,14 +273,13 @@ func getCommandNameFromParam(param APIParameter) string {
 
 // request executes SyncRequest and unmarshals response
 func (c *Client) request(param APIParameter, obj interface{}) error {
-	var v map[string]json.RawMessage
 	var content json.RawMessage
-	var ok bool
 
 	cmdName := getCommandNameFromParam(param)
 	cmd := config.Commands[cmdName]
+	pmap := convertParamToMap(param)
 
-	resp, err := c.SyncRequest(cmdName, convertParamToMap(param))
+	resp, err := c.SyncRequest(cmdName, pmap)
 	if err != nil {
 		return err
 	}
@@ -288,10 +287,31 @@ func (c *Client) request(param APIParameter, obj interface{}) error {
 	if cmd.Object == "result" {
 		content = resp
 	} else {
+		var v map[string]json.RawMessage
+		var ok bool
+
 		err = json.Unmarshal(resp, &v)
 		if err != nil {
 			return fmt.Errorf(
 				"Failed to unmarshal SyncRequest result (%s): %s", err, string(resp))
+		}
+
+		// if destroyvirtualmachine is executed with expunge=true, return nothing
+		if cmdName == "destroyVirtualMachine" {
+			expunge, ok := pmap["expunge"]
+			if ok && expunge.(NullBool).Bool() {
+				content, ok = v["null"]
+				if !ok {
+					errortext, _ := v["errortext"]
+					if ok {
+						return fmt.Errorf(string(errortext))
+					} else {
+						return fmt.Errorf(
+							"Unexpected SyncRequest response format: %s", string(resp))
+					}
+				}
+				return nil
+			}
 		}
 
 		content, ok = v[cmd.Object]
