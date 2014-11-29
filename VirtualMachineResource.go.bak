@@ -1,0 +1,19 @@
+package cloudstack
+
+func (vm *VirtualMachine) Read() (interface{}, error) {
+	p := NewListVirtualMachinesParameter()
+	p.Id.Set(vm.Id)
+	return vm.client.ListVirtualMachine(p)
+}
+
+func (vm *VirtualMachine) Update(args map[string]interface{}) (interface{}, error) {
+	p := NewUpdateVirtualMachineParameter()
+	p.Id.Set(vm.Id)
+	return vm.client.UpdateVirtualMachine(p)
+}
+
+func (vm *VirtualMachine) Delete() (interface{}, error) {
+	p := NewDestroyVirtualMachineParameter()
+	p.Id.Set(vm.Id)
+	return vm.client.DestroyVirtualMachine(p)
+}

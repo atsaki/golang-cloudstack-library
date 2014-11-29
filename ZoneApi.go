@@ -147,7 +147,7 @@ func NewListZonesParameter() (p *ListZonesParameter) {
 }
 
 // Lists zones
-func (c *Client) ListZones(p *ListZonesParameter) (objs []Zone, err error) {
+func (c *Client) ListZones(p *ListZonesParameter) (objs []*Zone, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

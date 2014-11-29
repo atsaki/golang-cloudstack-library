@@ -114,7 +114,7 @@ func NewListPortForwardingRulesParameter() (p *ListPortForwardingRulesParameter)
 }
 
 // Lists all port forwarding rules for an IP address.
-func (c *Client) ListPortForwardingRules(p *ListPortForwardingRulesParameter) (objs []PortForwardingRule, err error) {
+func (c *Client) ListPortForwardingRules(p *ListPortForwardingRulesParameter) (objs []*PortForwardingRule, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }
@@ -287,7 +287,7 @@ func NewListFirewallRulesParameter() (p *ListFirewallRulesParameter) {
 }
 
 // Lists all firewall rules for an IP address.
-func (c *Client) ListFirewallRules(p *ListFirewallRulesParameter) (objs []FirewallRule, err error) {
+func (c *Client) ListFirewallRules(p *ListFirewallRulesParameter) (objs []*FirewallRule, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }
@@ -391,7 +391,7 @@ func NewListEgressFirewallRulesParameter() (p *ListEgressFirewallRulesParameter)
 }
 
 // Lists all egress firewall rules for network id.
-func (c *Client) ListEgressFirewallRules(p *ListEgressFirewallRulesParameter) (objs []FirewallRule, err error) {
+func (c *Client) ListEgressFirewallRules(p *ListEgressFirewallRulesParameter) (objs []*FirewallRule, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

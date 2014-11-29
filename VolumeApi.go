@@ -78,7 +78,7 @@ func NewListVolumesParameter() (p *ListVolumesParameter) {
 }
 
 // Lists all volumes.
-func (c *Client) ListVolumes(p *ListVolumesParameter) (objs []Volume, err error) {
+func (c *Client) ListVolumes(p *ListVolumesParameter) (objs []*Volume, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

@@ -137,7 +137,7 @@ func NewListNetworksParameter() (p *ListNetworksParameter) {
 }
 
 // Lists all available networks.
-func (c *Client) ListNetworks(p *ListNetworksParameter) (objs []Network, err error) {
+func (c *Client) ListNetworks(p *ListNetworksParameter) (objs []*Network, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

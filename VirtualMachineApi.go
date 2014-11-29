@@ -635,7 +635,7 @@ func NewListVirtualMachinesParameter() (p *ListVirtualMachinesParameter) {
 }
 
 // List the virtual machines owned by the account.
-func (c *Client) ListVirtualMachines(p *ListVirtualMachinesParameter) (objs []VirtualMachine, err error) {
+func (c *Client) ListVirtualMachines(p *ListVirtualMachinesParameter) (objs []*VirtualMachine, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

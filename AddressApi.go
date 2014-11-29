@@ -57,7 +57,7 @@ func NewListPublicIpAddressesParameter() (p *ListPublicIpAddressesParameter) {
 }
 
 // Lists all public ip addresses
-func (c *Client) ListPublicIpAddresses(p *ListPublicIpAddressesParameter) (objs []PublicIpAddress, err error) {
+func (c *Client) ListPublicIpAddresses(p *ListPublicIpAddressesParameter) (objs []*PublicIpAddress, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

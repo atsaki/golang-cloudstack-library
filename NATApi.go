@@ -133,7 +133,7 @@ func NewListIpForwardingRulesParameter() (p *ListIpForwardingRulesParameter) {
 }
 
 // List the ip forwarding rules
-func (c *Client) ListIpForwardingRules(p *ListIpForwardingRulesParameter) (objs []IpForwardingRule, err error) {
+func (c *Client) ListIpForwardingRules(p *ListIpForwardingRulesParameter) (objs []*IpForwardingRule, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

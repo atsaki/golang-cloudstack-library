@@ -147,7 +147,7 @@ func NewListServiceOfferingsParameter() (p *ListServiceOfferingsParameter) {
 }
 
 // Lists all available service offerings.
-func (c *Client) ListServiceOfferings(p *ListServiceOfferingsParameter) (objs []ServiceOffering, err error) {
+func (c *Client) ListServiceOfferings(p *ListServiceOfferingsParameter) (objs []*ServiceOffering, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

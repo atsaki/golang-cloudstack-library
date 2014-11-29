@@ -62,7 +62,7 @@ func NewListTagsParameter() (p *ListTagsParameter) {
 }
 
 // List resource tag(s)
-func (c *Client) ListTags(p *ListTagsParameter) (objs []Tag, err error) {
+func (c *Client) ListTags(p *ListTagsParameter) (objs []*Tag, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

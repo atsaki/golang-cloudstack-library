@@ -48,7 +48,7 @@ func NewListDiskOfferingsParameter() (p *ListDiskOfferingsParameter) {
 }
 
 // Lists all available disk offerings.
-func (c *Client) ListDiskOfferings(p *ListDiskOfferingsParameter) (objs []DiskOffering, err error) {
+func (c *Client) ListDiskOfferings(p *ListDiskOfferingsParameter) (objs []*DiskOffering, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

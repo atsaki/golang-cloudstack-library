@@ -52,7 +52,7 @@ func NewListNetworkOfferingsParameter() (p *ListNetworkOfferingsParameter) {
 }
 
 // Lists all available network offerings.
-func (c *Client) ListNetworkOfferings(p *ListNetworkOfferingsParameter) (objs []NetworkOffering, err error) {
+func (c *Client) ListNetworkOfferings(p *ListNetworkOfferingsParameter) (objs []*NetworkOffering, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

@@ -195,7 +195,7 @@ func NewListSecurityGroupsParameter() (p *ListSecurityGroupsParameter) {
 }
 
 // Lists security groups
-func (c *Client) ListSecurityGroups(p *ListSecurityGroupsParameter) (objs []SecurityGroup, err error) {
+func (c *Client) ListSecurityGroups(p *ListSecurityGroupsParameter) (objs []*SecurityGroup, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

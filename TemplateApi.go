@@ -98,7 +98,7 @@ func NewListTemplatePermissionsParameter(id string) (p *ListTemplatePermissionsP
 
 // List template visibility and all accounts that have permissions to view this
 // template.
-func (c *Client) ListTemplatePermissions(p *ListTemplatePermissionsParameter) (objs []TemplatePermission, err error) {
+func (c *Client) ListTemplatePermissions(p *ListTemplatePermissionsParameter) (objs []*TemplatePermission, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }
@@ -248,7 +248,7 @@ func NewListTemplatesParameter(templatefilter string) (p *ListTemplatesParameter
 }
 
 // List all public, private, and privileged templates.
-func (c *Client) ListTemplates(p *ListTemplatesParameter) (objs []Template, err error) {
+func (c *Client) ListTemplates(p *ListTemplatesParameter) (objs []*Template, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }

@@ -44,7 +44,7 @@ func NewListAffinityGroupTypesParameter() (p *ListAffinityGroupTypesParameter) {
 }
 
 // Lists affinity group types available
-func (c *Client) ListAffinityGroupTypes(p *ListAffinityGroupTypesParameter) (objs []AffinityGroupType, err error) {
+func (c *Client) ListAffinityGroupTypes(p *ListAffinityGroupTypesParameter) (objs []*AffinityGroupType, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }
@@ -113,7 +113,7 @@ func NewListAffinityGroupsParameter() (p *ListAffinityGroupsParameter) {
 }
 
 // Lists affinity groups
-func (c *Client) ListAffinityGroups(p *ListAffinityGroupsParameter) (objs []AffinityGroup, err error) {
+func (c *Client) ListAffinityGroups(p *ListAffinityGroupsParameter) (objs []*AffinityGroup, err error) {
 	err = c.request(p, &objs)
 	return objs, err
 }
