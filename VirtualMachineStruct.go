@@ -121,4 +121,6 @@ type VirtualMachine struct {
 	ZoneId ID `json:"zoneid"`
 	// the name of the availability zone for the virtual machine
 	ZoneName NullString `json:"zonename"`
+	// CloudStack API Client
+	Client *Client
 }

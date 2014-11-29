@@ -7,4 +7,6 @@ type NetworkService struct {
 	Name NullString `json:"name"`
 	// the service provider name
 	Provider []NetworkServiceProvider `json:"provider"`
+	// CloudStack API Client
+	Client *Client
 }

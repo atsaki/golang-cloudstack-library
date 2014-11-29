@@ -21,4 +21,6 @@ type Capacity struct {
 	ZoneId ID `json:"zoneid"`
 	// the Zone name
 	ZoneName NullString `json:"zonename"`
+	// CloudStack API Client
+	Client *Client
 }

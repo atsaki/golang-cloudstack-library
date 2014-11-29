@@ -23,4 +23,6 @@ type SecurityGroup struct {
 	ProjectId ID `json:"projectid"`
 	// the list of resource tags associated with the rule
 	Tags []Tag `json:"tags"`
+	// CloudStack API Client
+	Client *Client
 }

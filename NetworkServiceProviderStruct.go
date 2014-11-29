@@ -15,4 +15,6 @@ type NetworkServiceProvider struct {
 	ServiceList []NullString `json:"servicelist"`
 	// state of the network provider
 	State NullString `json:"state"`
+	// CloudStack API Client
+	Client *Client
 }

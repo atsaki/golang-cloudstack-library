@@ -47,4 +47,6 @@ type NetworkOffering struct {
 	// the traffic type for the network offering, supported types are Public,
 	// Management, Control, Guest, Vlan or Storage.
 	TrafficType NullString `json:"traffictype"`
+	// CloudStack API Client
+	Client *Client
 }

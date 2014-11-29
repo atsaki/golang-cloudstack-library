@@ -44,4 +44,6 @@ type DiskOffering struct {
 	StorageType NullString `json:"storagetype"`
 	// the tags for the disk offering
 	Tags NullString `json:"tags"`
+	// CloudStack API Client
+	Client *Client
 }

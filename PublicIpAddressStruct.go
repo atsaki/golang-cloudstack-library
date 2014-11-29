@@ -67,4 +67,6 @@ type PublicIpAddress struct {
 	ZoneId ID `json:"zoneid"`
 	// the name of the zone the public IP address belongs to
 	ZoneName NullString `json:"zonename"`
+	// CloudStack API Client
+	Client *Client
 }

@@ -74,6 +74,17 @@ func getErrorText(b []byte) (errortext string) {
 	return errortext
 }
 
+func setClientField(obj interface{}, client *Client) {
+	v := reflect.ValueOf(obj).Elem()
+	if v.Kind() == reflect.Slice {
+		for i := 0; i < v.Len(); i++ {
+			v.Index(i).Elem().FieldByName("Client").Set(reflect.ValueOf(client))
+		}
+	} else if v.Kind() == reflect.Ptr {
+		v.Elem().FieldByName("Client").Set(reflect.ValueOf(client))
+	}
+}
+
 type Client struct {
 	EndPoint        *url.URL
 	APIKey          string
@@ -353,6 +364,8 @@ func (c *Client) request(param APIParameter, obj interface{}) error {
 		return fmt.Errorf(
 			"Failed to unmarshal content (%s): %s", err, string(content))
 	}
+
+	setClientField(obj, c)
 
 	return nil
 }

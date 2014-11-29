@@ -17,4 +17,6 @@ type AffinityGroup struct {
 	Type NullString `json:"type"`
 	// virtual machine Ids associated with this affinity group
 	VirtualMachineIds []ID `json:"virtualmachineids"`
+	// CloudStack API Client
+	Client *Client
 }

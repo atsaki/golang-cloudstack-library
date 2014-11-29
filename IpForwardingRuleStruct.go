@@ -35,4 +35,6 @@ type IpForwardingRule struct {
 	VirtualMachineName NullString `json:"virtualmachinename"`
 	// the vm ip address for the port forwarding rule
 	VmGuestIp NullString `json:"vmguestip"`
+	// CloudStack API Client
+	Client *Client
 }

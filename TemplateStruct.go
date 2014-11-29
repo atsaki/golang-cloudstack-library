@@ -74,4 +74,6 @@ type Template struct {
 	ZoneId ID `json:"zoneid"`
 	// the name of the zone for this template
 	ZoneName NullString `json:"zonename"`
+	// CloudStack API Client
+	Client *Client
 }

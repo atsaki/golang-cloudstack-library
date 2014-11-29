@@ -101,4 +101,6 @@ type Network struct {
 	// If a network is enabled for 'streched l2 subnet' then represents zones on
 	// which network currently spans
 	ZonesNetworkspans []NullString `json:"zonesnetworkspans"`
+	// CloudStack API Client
+	Client *Client
 }

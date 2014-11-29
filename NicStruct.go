@@ -37,4 +37,6 @@ type Nic struct {
 	Type NullString `json:"type"`
 	// Id of the vm to which the nic belongs
 	VirtualMachineId ID `json:"virtualmachineid"`
+	// CloudStack API Client
+	Client *Client
 }

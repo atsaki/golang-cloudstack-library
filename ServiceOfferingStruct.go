@@ -63,4 +63,6 @@ type ServiceOffering struct {
 	SystemVmType NullString `json:"systemvmtype"`
 	// the tags for the service offering
 	Tags NullString `json:"tags"`
+	// CloudStack API Client
+	Client *Client
 }

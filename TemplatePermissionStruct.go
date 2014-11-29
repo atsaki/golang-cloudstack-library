@@ -11,4 +11,6 @@ type TemplatePermission struct {
 	IsPublic NullBool `json:"ispublic"`
 	// the list of projects the template is available for
 	ProjectIds []ID `json:"projectids"`
+	// CloudStack API Client
+	Client *Client
 }

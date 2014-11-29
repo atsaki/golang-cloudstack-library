@@ -27,4 +27,6 @@ type FirewallRule struct {
 	State NullString `json:"state"`
 	// the list of resource tags associated with the rule
 	Tags []Tag `json:"tags"`
+	// CloudStack API Client
+	Client *Client
 }

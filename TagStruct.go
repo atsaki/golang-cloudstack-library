@@ -21,4 +21,6 @@ type Tag struct {
 	ResourceType NullString `json:"resourcetype"`
 	// tag value
 	Value NullString `json:"value"`
+	// CloudStack API Client
+	Client *Client
 }

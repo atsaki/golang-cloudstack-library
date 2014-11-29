@@ -49,4 +49,6 @@ type Zone struct {
 	Vlan NullString `json:"vlan"`
 	// Zone Token
 	Zonetoken NullString `json:"zonetoken"`
+	// CloudStack API Client
+	Client *Client
 }

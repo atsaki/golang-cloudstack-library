@@ -19,4 +19,6 @@ type SecurityGroupIngress struct {
 	SecurityGroupName NullString `json:"securitygroupname"`
 	// the starting IP of the security group rule
 	StartPort NullNumber `json:"startport"`
+	// CloudStack API Client
+	Client *Client
 }

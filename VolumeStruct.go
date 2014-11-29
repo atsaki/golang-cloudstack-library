@@ -104,4 +104,6 @@ type Volume struct {
 	ZoneId ID `json:"zoneid"`
 	// name of the availability zone
 	ZoneName NullString `json:"zonename"`
+	// CloudStack API Client
+	Client *Client
 }
