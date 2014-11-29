@@ -159,6 +159,25 @@ func (c *Client) GenerateQueryURL(command string, params map[string]interface{})
 	values.Add("command", command)
 	values.Add("response", "json")
 	for k := range params {
+
+		if k == "userdata" {
+			ns, ok := params[k].(NullString)
+			if ok && !ns.IsNil() {
+				s := ns.String()
+				// There seems to be a issue if base64 encoded string ended with
+				// padding character "="
+				// add space to original string to make result not ended with "="
+				for {
+					if len(s)%3 == 0 {
+						break
+					}
+					s += " "
+				}
+				values.Add(k, base64.StdEncoding.EncodeToString([]byte(s)))
+			}
+			continue
+		}
+
 		switch v := params[k].(type) {
 		case []string:
 			if len(v) > 0 {
