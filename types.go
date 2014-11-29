@@ -12,6 +12,15 @@ import (
 
 type APIParameter interface{}
 
+type Resource interface {
+	// refresh information about the resource
+	Read() (Resource, error)
+	// update the resource with specified args
+	Update(args map[string]interface{}) (Resource, error)
+	// delete the resource
+	Delete() (Resource, error)
+}
+
 type Nullable interface {
 	Value() interface{}
 	String() string
