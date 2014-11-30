@@ -1,6 +1,7 @@
 package cloudstack
 
 type Tag struct {
+	ResourceBase
 	// the account associated with the tag
 	Account NullString `json:"account"`
 	// customer associated with the tag
@@ -21,6 +22,4 @@ type Tag struct {
 	ResourceType NullString `json:"resourcetype"`
 	// tag value
 	Value NullString `json:"value"`
-	// CloudStack API Client
-	Client *Client
 }

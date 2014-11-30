@@ -24,9 +24,12 @@ func NewCreateAffinityGroupParameter(name string, typ string) (p *CreateAffinity
 }
 
 // Creates an affinity/anti-affinity group
-func (c *Client) CreateAffinityGroup(p *CreateAffinityGroupParameter) (obj *AffinityGroup, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateAffinityGroup(p *CreateAffinityGroupParameter) (*AffinityGroup, error) {
+	obj, err := c.Request("createAffinityGroup", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*AffinityGroup), err
 }
 
 
@@ -44,9 +47,12 @@ func NewListAffinityGroupTypesParameter() (p *ListAffinityGroupTypesParameter) {
 }
 
 // Lists affinity group types available
-func (c *Client) ListAffinityGroupTypes(p *ListAffinityGroupTypesParameter) (objs []*AffinityGroupType, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListAffinityGroupTypes(p *ListAffinityGroupTypesParameter) ([]*AffinityGroupType, error) {
+	obj, err := c.Request("listAffinityGroupTypes", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*AffinityGroupType), err
 }
 
 
@@ -74,9 +80,12 @@ func NewUpdateVMAffinityGroupParameter(id string) (p *UpdateVMAffinityGroupParam
 
 // Updates the affinity/anti-affinity group associations of a virtual machine.
 // The VM has to be stopped and restarted for the new properties to take effect.
-func (c *Client) UpdateVMAffinityGroup(p *UpdateVMAffinityGroupParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateVMAffinityGroup(p *UpdateVMAffinityGroupParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("updateVMAffinityGroup", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -113,9 +122,12 @@ func NewListAffinityGroupsParameter() (p *ListAffinityGroupsParameter) {
 }
 
 // Lists affinity groups
-func (c *Client) ListAffinityGroups(p *ListAffinityGroupsParameter) (objs []*AffinityGroup, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListAffinityGroups(p *ListAffinityGroupsParameter) ([]*AffinityGroup, error) {
+	obj, err := c.Request("listAffinityGroups", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*AffinityGroup), err
 }
 
 
@@ -137,8 +149,11 @@ func NewDeleteAffinityGroupParameter() (p *DeleteAffinityGroupParameter) {
 }
 
 // Deletes affinity group
-func (c *Client) DeleteAffinityGroup(p *DeleteAffinityGroupParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteAffinityGroup(p *DeleteAffinityGroupParameter) (*Result, error) {
+	obj, err := c.Request("deleteAffinityGroup", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 

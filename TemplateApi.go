@@ -21,9 +21,12 @@ func NewCopyTemplateParameter(destzoneid string, id string) (p *CopyTemplatePara
 }
 
 // Copies a template from one zone to another.
-func (c *Client) CopyTemplate(p *CopyTemplateParameter) (obj *Template, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CopyTemplate(p *CopyTemplateParameter) (*Template, error) {
+	obj, err := c.Request("copyTemplate", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Template), err
 }
 
 
@@ -78,9 +81,12 @@ func NewCreateTemplateParameter(displaytext string, name string, ostypeid string
 // Creates a template of a virtual machine. The virtual machine must be in a
 // STOPPED state. A template created from this command is automatically
 // designated as a private template visible to the account that created it.
-func (c *Client) CreateTemplate(p *CreateTemplateParameter) (obj *Template, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateTemplate(p *CreateTemplateParameter) (*Template, error) {
+	obj, err := c.Request("createTemplate", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Template), err
 }
 
 
@@ -98,9 +104,12 @@ func NewListTemplatePermissionsParameter(id string) (p *ListTemplatePermissionsP
 
 // List template visibility and all accounts that have permissions to view this
 // template.
-func (c *Client) ListTemplatePermissions(p *ListTemplatePermissionsParameter) (objs []*TemplatePermission, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListTemplatePermissions(p *ListTemplatePermissionsParameter) ([]*TemplatePermission, error) {
+	obj, err := c.Request("listTemplatePermissions", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*TemplatePermission), err
 }
 
 
@@ -120,9 +129,12 @@ func NewDeleteTemplateParameter(id string) (p *DeleteTemplateParameter) {
 
 // Deletes a template from the system. All virtual machines using the deleted
 // template will not be affected.
-func (c *Client) DeleteTemplate(p *DeleteTemplateParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteTemplate(p *DeleteTemplateParameter) (*Result, error) {
+	obj, err := c.Request("deleteTemplate", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -191,9 +203,12 @@ func NewRegisterTemplateParameter(displaytext string, format string, hypervisor 
 }
 
 // Registers an existing template into the CloudStack cloud.
-func (c *Client) RegisterTemplate(p *RegisterTemplateParameter) (obj *Template, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) RegisterTemplate(p *RegisterTemplateParameter) (*Template, error) {
+	obj, err := c.Request("registerTemplate", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Template), err
 }
 
 
@@ -248,9 +263,12 @@ func NewListTemplatesParameter(templatefilter string) (p *ListTemplatesParameter
 }
 
 // List all public, private, and privileged templates.
-func (c *Client) ListTemplates(p *ListTemplatesParameter) (objs []*Template, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListTemplates(p *ListTemplatesParameter) ([]*Template, error) {
+	obj, err := c.Request("listTemplates", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*Template), err
 }
 
 
@@ -270,9 +288,12 @@ func NewPrepareTemplateParameter(templateid string, zoneid string) (p *PrepareTe
 }
 
 // load template into primary storage
-func (c *Client) PrepareTemplate(p *PrepareTemplateParameter) (obj *Template, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) PrepareTemplate(p *PrepareTemplateParameter) (*Template, error) {
+	obj, err := c.Request("prepareTemplate", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Template), err
 }
 
 
@@ -309,9 +330,12 @@ func NewUpdateTemplateParameter(id string) (p *UpdateTemplateParameter) {
 }
 
 // Updates attributes of a template.
-func (c *Client) UpdateTemplate(p *UpdateTemplateParameter) (obj *Template, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateTemplate(p *UpdateTemplateParameter) (*Template, error) {
+	obj, err := c.Request("updateTemplate", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Template), err
 }
 
 
@@ -335,9 +359,12 @@ func NewExtractTemplateParameter(id string, mode string) (p *ExtractTemplatePara
 }
 
 // Extracts a template
-func (c *Client) ExtractTemplate(p *ExtractTemplateParameter) (obj *Template, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) ExtractTemplate(p *ExtractTemplateParameter) (*Template, error) {
+	obj, err := c.Request("extractTemplate", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Template), err
 }
 
 
@@ -373,8 +400,11 @@ func NewUpdateTemplatePermissionsParameter(id string) (p *UpdateTemplatePermissi
 // the owner of the template. A priviledged template is a private template with
 // account permissions added. Only accounts specified under the template
 // permissions are visible to them.
-func (c *Client) UpdateTemplatePermissions(p *UpdateTemplatePermissionsParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateTemplatePermissions(p *UpdateTemplatePermissionsParameter) (*Result, error) {
+	obj, err := c.Request("updateTemplatePermissions", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 

@@ -1,6 +1,7 @@
 package cloudstack
 
 type AffinityGroup struct {
+	ResourceBase
 	// the account owning the affinity group
 	Account NullString `json:"account"`
 	// the description of the affinity group
@@ -17,6 +18,4 @@ type AffinityGroup struct {
 	Type NullString `json:"type"`
 	// virtual machine Ids associated with this affinity group
 	VirtualMachineIds []ID `json:"virtualmachineids"`
-	// CloudStack API Client
-	Client *Client
 }

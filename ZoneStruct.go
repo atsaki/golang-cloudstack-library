@@ -1,6 +1,7 @@
 package cloudstack
 
 type Zone struct {
+	ResourceBase
 	// the allocation state of the cluster
 	AllocationState NullString `json:"allocationstate"`
 	// the capacity of the Zone
@@ -49,6 +50,4 @@ type Zone struct {
 	Vlan NullString `json:"vlan"`
 	// Zone Token
 	Zonetoken NullString `json:"zonetoken"`
-	// CloudStack API Client
-	Client *Client
 }

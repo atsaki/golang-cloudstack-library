@@ -98,7 +98,7 @@ func TestListVirtualMachines(t *testing.T) {
 	if vms[0].Nic[0].IpAddress.String() != "10.3.0.2" {
 		t.Errorf("ipaddress: actual %s, expected 10.3.0.2", vms[0].Nic[0].IpAddress.String())
 	}
-	if vms[0].Client.EndPoint != endpoint {
-		t.Errorf("endpoint: actual %v, expected %v", vms[0].Client.EndPoint, endpoint)
+	if vms[0].client.EndPoint != endpoint {
+		t.Errorf("endpoint: actual %v, expected %v", vms[0].client.EndPoint, endpoint)
 	}
 }

@@ -22,9 +22,12 @@ func NewUpdateDiskOfferingParameter(id string) (p *UpdateDiskOfferingParameter) 
 }
 
 // Updates a disk offering.
-func (c *Client) UpdateDiskOffering(p *UpdateDiskOfferingParameter) (obj *DiskOffering, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateDiskOffering(p *UpdateDiskOfferingParameter) (*DiskOffering, error) {
+	obj, err := c.Request("updateDiskOffering", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*DiskOffering), err
 }
 
 
@@ -48,9 +51,12 @@ func NewListDiskOfferingsParameter() (p *ListDiskOfferingsParameter) {
 }
 
 // Lists all available disk offerings.
-func (c *Client) ListDiskOfferings(p *ListDiskOfferingsParameter) (objs []*DiskOffering, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListDiskOfferings(p *ListDiskOfferingsParameter) ([]*DiskOffering, error) {
+	obj, err := c.Request("listDiskOfferings", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*DiskOffering), err
 }
 
 
@@ -67,9 +73,12 @@ func NewDeleteDiskOfferingParameter(id string) (p *DeleteDiskOfferingParameter) 
 }
 
 // Updates a disk offering.
-func (c *Client) DeleteDiskOffering(p *DeleteDiskOfferingParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteDiskOffering(p *DeleteDiskOfferingParameter) (*Result, error) {
+	obj, err := c.Request("deleteDiskOffering", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -118,8 +127,11 @@ func NewCreateDiskOfferingParameter(displaytext string, name string) (p *CreateD
 }
 
 // Creates a disk offering.
-func (c *Client) CreateDiskOffering(p *CreateDiskOfferingParameter) (obj *DiskOffering, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateDiskOffering(p *CreateDiskOfferingParameter) (*DiskOffering, error) {
+	obj, err := c.Request("createDiskOffering", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*DiskOffering), err
 }
 

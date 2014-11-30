@@ -14,9 +14,12 @@ func NewDeleteIpForwardingRuleParameter(id string) (p *DeleteIpForwardingRulePar
 }
 
 // Deletes an ip forwarding rule
-func (c *Client) DeleteIpForwardingRule(p *DeleteIpForwardingRuleParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteIpForwardingRule(p *DeleteIpForwardingRuleParameter) (*Result, error) {
+	obj, err := c.Request("deleteIpForwardingRule", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -41,9 +44,12 @@ func NewEnableStaticNatParameter(ipaddressid string, virtualmachineid string) (p
 }
 
 // Enables static nat for given ip address
-func (c *Client) EnableStaticNat(p *EnableStaticNatParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) EnableStaticNat(p *EnableStaticNatParameter) (*Result, error) {
+	obj, err := c.Request("enableStaticNat", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -75,9 +81,12 @@ func NewCreateIpForwardingRuleParameter(ipaddressid string, protocol string, sta
 }
 
 // Creates an ip forwarding rule
-func (c *Client) CreateIpForwardingRule(p *CreateIpForwardingRuleParameter) (obj *IpForwardingRule, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateIpForwardingRule(p *CreateIpForwardingRuleParameter) (*IpForwardingRule, error) {
+	obj, err := c.Request("createIpForwardingRule", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*IpForwardingRule), err
 }
 
 
@@ -94,9 +103,12 @@ func NewDisableStaticNatParameter(ipaddressid string) (p *DisableStaticNatParame
 }
 
 // Disables static rule for given ip address
-func (c *Client) DisableStaticNat(p *DisableStaticNatParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DisableStaticNat(p *DisableStaticNatParameter) (*Result, error) {
+	obj, err := c.Request("disableStaticNat", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -133,8 +145,11 @@ func NewListIpForwardingRulesParameter() (p *ListIpForwardingRulesParameter) {
 }
 
 // List the ip forwarding rules
-func (c *Client) ListIpForwardingRules(p *ListIpForwardingRulesParameter) (objs []*IpForwardingRule, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListIpForwardingRules(p *ListIpForwardingRulesParameter) ([]*IpForwardingRule, error) {
+	obj, err := c.Request("listIpForwardingRules", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*IpForwardingRule), err
 }
 

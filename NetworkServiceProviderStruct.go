@@ -1,6 +1,7 @@
 package cloudstack
 
 type NetworkServiceProvider struct {
+	ResourceBase
 	// true if individual services can be enabled/disabled
 	CanEnableIndividualService NullBool `json:"canenableindividualservice"`
 	// the destination physical network
@@ -15,6 +16,4 @@ type NetworkServiceProvider struct {
 	ServiceList []NullString `json:"servicelist"`
 	// state of the network provider
 	State NullString `json:"state"`
-	// CloudStack API Client
-	Client *Client
 }

@@ -1,6 +1,7 @@
 package cloudstack
 
 type DiskOffering struct {
+	ResourceBase
 	// the cache mode to use for this disk offering. none, writeback or writethrough
 	CacheMode NullString `json:"cachemode"`
 	// the date this disk offering was created
@@ -44,6 +45,4 @@ type DiskOffering struct {
 	StorageType NullString `json:"storagetype"`
 	// the tags for the disk offering
 	Tags NullString `json:"tags"`
-	// CloudStack API Client
-	Client *Client
 }

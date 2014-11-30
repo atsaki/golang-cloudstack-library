@@ -1,6 +1,7 @@
 package cloudstack
 
 type PortForwardingRule struct {
+	ResourceBase
 	// the cidr list to forward traffic from
 	CidrList NullString `json:"cidrlist"`
 	// is firewall for display to the regular user
@@ -35,6 +36,4 @@ type PortForwardingRule struct {
 	VirtualMachineName NullString `json:"virtualmachinename"`
 	// the vm ip address for the port forwarding rule
 	VmGuestIp NullString `json:"vmguestip"`
-	// CloudStack API Client
-	Client *Client
 }

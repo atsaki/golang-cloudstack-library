@@ -19,9 +19,12 @@ func NewDeleteTagsParameter(resourceids []string, resourcetype string) (p *Delet
 }
 
 // Deleting resource tag(s)
-func (c *Client) DeleteTags(p *DeleteTagsParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteTags(p *DeleteTagsParameter) (*Result, error) {
+	obj, err := c.Request("deleteTags", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -62,9 +65,12 @@ func NewListTagsParameter() (p *ListTagsParameter) {
 }
 
 // List resource tag(s)
-func (c *Client) ListTags(p *ListTagsParameter) (objs []*Tag, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListTags(p *ListTagsParameter) ([]*Tag, error) {
+	obj, err := c.Request("listTags", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*Tag), err
 }
 
 
@@ -90,8 +96,11 @@ func NewCreateTagsParameter(resourceids []string, resourcetype string, tags map[
 }
 
 // Creates resource tag(s)
-func (c *Client) CreateTags(p *CreateTagsParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateTags(p *CreateTagsParameter) (*Result, error) {
+	obj, err := c.Request("createTags", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 

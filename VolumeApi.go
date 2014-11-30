@@ -22,9 +22,12 @@ func NewExtractVolumeParameter(id string, mode string, zoneid string) (p *Extrac
 }
 
 // Extracts volume
-func (c *Client) ExtractVolume(p *ExtractVolumeParameter) (obj *Volume, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) ExtractVolume(p *ExtractVolumeParameter) (*Volume, error) {
+	obj, err := c.Request("extractVolume", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Volume), err
 }
 
 
@@ -78,9 +81,12 @@ func NewListVolumesParameter() (p *ListVolumesParameter) {
 }
 
 // Lists all volumes.
-func (c *Client) ListVolumes(p *ListVolumesParameter) (objs []*Volume, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListVolumes(p *ListVolumesParameter) ([]*Volume, error) {
+	obj, err := c.Request("listVolumes", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*Volume), err
 }
 
 
@@ -102,9 +108,12 @@ func NewMigrateVolumeParameter(storageid string, volumeid string) (p *MigrateVol
 }
 
 // Migrate volume
-func (c *Client) MigrateVolume(p *MigrateVolumeParameter) (obj *Volume, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) MigrateVolume(p *MigrateVolumeParameter) (*Volume, error) {
+	obj, err := c.Request("migrateVolume", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Volume), err
 }
 
 
@@ -129,9 +138,12 @@ func NewAttachVolumeParameter(id string, virtualmachineid string) (p *AttachVolu
 }
 
 // Attaches a disk volume to a virtual machine.
-func (c *Client) AttachVolume(p *AttachVolumeParameter) (obj *Volume, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) AttachVolume(p *AttachVolumeParameter) (*Volume, error) {
+	obj, err := c.Request("attachVolume", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Volume), err
 }
 
 
@@ -160,9 +172,12 @@ func NewUpdateVolumeParameter() (p *UpdateVolumeParameter) {
 }
 
 // Updates the volume.
-func (c *Client) UpdateVolume(p *UpdateVolumeParameter) (obj *Volume, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateVolume(p *UpdateVolumeParameter) (*Volume, error) {
+	obj, err := c.Request("updateVolume", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Volume), err
 }
 
 
@@ -185,9 +200,12 @@ func NewResizeVolumeParameter(id string) (p *ResizeVolumeParameter) {
 }
 
 // Resizes a volume
-func (c *Client) ResizeVolume(p *ResizeVolumeParameter) (obj *Volume, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) ResizeVolume(p *ResizeVolumeParameter) (*Volume, error) {
+	obj, err := c.Request("resizeVolume", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Volume), err
 }
 
 
@@ -207,9 +225,12 @@ func NewDetachVolumeParameter() (p *DetachVolumeParameter) {
 }
 
 // Detaches a disk volume from a virtual machine.
-func (c *Client) DetachVolume(p *DetachVolumeParameter) (obj *Volume, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DetachVolume(p *DetachVolumeParameter) (*Volume, error) {
+	obj, err := c.Request("detachVolume", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Volume), err
 }
 
 
@@ -226,9 +247,12 @@ func NewDeleteVolumeParameter(id string) (p *DeleteVolumeParameter) {
 }
 
 // Deletes a detached disk volume.
-func (c *Client) DeleteVolume(p *DeleteVolumeParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteVolume(p *DeleteVolumeParameter) (*Result, error) {
+	obj, err := c.Request("deleteVolume", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -278,9 +302,12 @@ func NewCreateVolumeParameter(name string) (p *CreateVolumeParameter) {
 
 // Creates a disk volume from a disk offering. This disk volume must still be
 // attached to a virtual machine to make use of it.
-func (c *Client) CreateVolume(p *CreateVolumeParameter) (obj *Volume, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateVolume(p *CreateVolumeParameter) (*Volume, error) {
+	obj, err := c.Request("createVolume", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Volume), err
 }
 
 
@@ -318,8 +345,11 @@ func NewUploadVolumeParameter(format string, name string, url string, zoneid str
 }
 
 // Uploads a data disk.
-func (c *Client) UploadVolume(p *UploadVolumeParameter) (obj *Volume, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UploadVolume(p *UploadVolumeParameter) (*Volume, error) {
+	obj, err := c.Request("uploadVolume", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Volume), err
 }
 

@@ -1,6 +1,7 @@
 package cloudstack
 
 type SecurityGroupIngress struct {
+	ResourceBase
 	// account owning the security group rule
 	Account NullString `json:"account"`
 	// the CIDR notation for the base IP address of the security group rule
@@ -19,6 +20,4 @@ type SecurityGroupIngress struct {
 	SecurityGroupName NullString `json:"securitygroupname"`
 	// the starting IP of the security group rule
 	StartPort NullNumber `json:"startport"`
-	// CloudStack API Client
-	Client *Client
 }

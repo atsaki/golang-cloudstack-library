@@ -72,9 +72,12 @@ func NewCreateNetworkParameter(displaytext string, name string, networkofferingi
 }
 
 // Creates a network
-func (c *Client) CreateNetwork(p *CreateNetworkParameter) (obj *Network, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateNetwork(p *CreateNetworkParameter) (*Network, error) {
+	obj, err := c.Request("createNetwork", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Network), err
 }
 
 
@@ -137,9 +140,12 @@ func NewListNetworksParameter() (p *ListNetworksParameter) {
 }
 
 // Lists all available networks.
-func (c *Client) ListNetworks(p *ListNetworksParameter) (objs []*Network, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListNetworks(p *ListNetworksParameter) ([]*Network, error) {
+	obj, err := c.Request("listNetworks", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*Network), err
 }
 
 
@@ -160,9 +166,12 @@ func NewRestartNetworkParameter(id string) (p *RestartNetworkParameter) {
 // Restarts the network; includes 1) restarting network elements - virtual
 // routers, dhcp servers 2) reapplying all public ips 3) reapplying
 // loadBalancing/portForwarding rules
-func (c *Client) RestartNetwork(p *RestartNetworkParameter) (obj *Network, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) RestartNetwork(p *RestartNetworkParameter) (*Network, error) {
+	obj, err := c.Request("restartNetwork", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Network), err
 }
 
 
@@ -182,9 +191,12 @@ func NewDeleteNetworkParameter(id string) (p *DeleteNetworkParameter) {
 }
 
 // Deletes a network
-func (c *Client) DeleteNetwork(p *DeleteNetworkParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteNetwork(p *DeleteNetworkParameter) (*Result, error) {
+	obj, err := c.Request("deleteNetwork", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -218,8 +230,11 @@ func NewUpdateNetworkParameter(id string) (p *UpdateNetworkParameter) {
 }
 
 // Updates a network
-func (c *Client) UpdateNetwork(p *UpdateNetworkParameter) (obj *Network, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateNetwork(p *UpdateNetworkParameter) (*Network, error) {
+	obj, err := c.Request("updateNetwork", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Network), err
 }
 

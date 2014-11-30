@@ -20,9 +20,12 @@ func NewUpdateServiceOfferingParameter(id string) (p *UpdateServiceOfferingParam
 }
 
 // Updates a service offering.
-func (c *Client) UpdateServiceOffering(p *UpdateServiceOfferingParameter) (obj *ServiceOffering, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateServiceOffering(p *UpdateServiceOfferingParameter) (*ServiceOffering, error) {
+	obj, err := c.Request("updateServiceOffering", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*ServiceOffering), err
 }
 
 
@@ -94,9 +97,12 @@ func NewCreateServiceOfferingParameter(displaytext string, name string) (p *Crea
 }
 
 // Creates a service offering.
-func (c *Client) CreateServiceOffering(p *CreateServiceOfferingParameter) (obj *ServiceOffering, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateServiceOffering(p *CreateServiceOfferingParameter) (*ServiceOffering, error) {
+	obj, err := c.Request("createServiceOffering", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*ServiceOffering), err
 }
 
 
@@ -113,9 +119,12 @@ func NewDeleteServiceOfferingParameter(id string) (p *DeleteServiceOfferingParam
 }
 
 // Deletes a service offering.
-func (c *Client) DeleteServiceOffering(p *DeleteServiceOfferingParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteServiceOffering(p *DeleteServiceOfferingParameter) (*Result, error) {
+	obj, err := c.Request("deleteServiceOffering", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -147,8 +156,11 @@ func NewListServiceOfferingsParameter() (p *ListServiceOfferingsParameter) {
 }
 
 // Lists all available service offerings.
-func (c *Client) ListServiceOfferings(p *ListServiceOfferingsParameter) (objs []*ServiceOffering, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListServiceOfferings(p *ListServiceOfferingsParameter) ([]*ServiceOffering, error) {
+	obj, err := c.Request("listServiceOfferings", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*ServiceOffering), err
 }
 

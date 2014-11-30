@@ -2,26 +2,55 @@ package cloudstack
 
 import "fmt"
 
-func (vm *VirtualMachine) Refresh() (Resource, error) {
+func (c *Client) GetVirtualMachine(id string) (*VirtualMachine, error) {
 	p := NewListVirtualMachinesParameter()
-	p.Id.Set(vm.Id)
-	vms, err := vm.Client.ListVirtualMachines(p)
+	p.Id.Set(id)
+	rs, err := c.ListVirtualMachines(p)
 	if err != nil {
 		return nil, err
 	}
-	if len(vms) != 1 {
-		return nil, fmt.Errorf("Expected just 1 item, %d items are returned", len(vms))
+	if len(rs) != 1 {
+		return nil, fmt.Errorf("Expected just 1 item, %d items are returned", len(rs))
 	}
-	return vms[0], nil
+	return rs[0], nil
 }
 
-func (vm *VirtualMachine) Update(args map[string]interface{}) (Resource, error) {
-	return nil, nil
+func (r *VirtualMachine) Refresh() (err error) {
+	newr, err := r.client.GetVirtualMachine(r.Id.String())
+	if newr != nil {
+		*r = *newr
+	} else {
+		newr = new(VirtualMachine)
+		newr.setClient(r.client)
+		*r = *newr
+	}
+	*r = *newr
+	return err
 }
 
-func (vm *VirtualMachine) Delete() error {
-	p := NewDestroyVirtualMachineParameter(vm.Id.String())
+func (r *VirtualMachine) Update(args map[string]interface{}) (err error) {
+	p := NewUpdateVirtualMachineParameter(r.Id.String())
+	newr, err := r.client.UpdateVirtualMachine(p)
+	if newr != nil {
+		*r = *newr
+	} else {
+		newr = new(VirtualMachine)
+		newr.setClient(r.client)
+		*r = *newr
+	}
+	return err
+}
+
+func (r *VirtualMachine) Delete() (err error) {
+	p := NewDestroyVirtualMachineParameter(r.Id.String())
 	p.Expunge.Set(true)
-	_, err := vm.Client.DestroyVirtualMachine(p)
+	newr, err := r.client.DestroyVirtualMachine(p)
+	if newr != nil {
+		*r = *newr
+	} else {
+		newr = new(VirtualMachine)
+		newr.setClient(r.client)
+		*r = *newr
+	}
 	return err
 }

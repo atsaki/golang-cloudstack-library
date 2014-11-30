@@ -1,6 +1,7 @@
 package cloudstack
 
 type PublicIpAddress struct {
+	ResourceBase
 	// the account the public IP address is associated with
 	Account NullString `json:"account"`
 	// date the public IP address was acquired
@@ -67,6 +68,4 @@ type PublicIpAddress struct {
 	ZoneId ID `json:"zoneid"`
 	// the name of the zone the public IP address belongs to
 	ZoneName NullString `json:"zonename"`
-	// CloudStack API Client
-	Client *Client
 }

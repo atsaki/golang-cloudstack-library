@@ -13,12 +13,136 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"reflect"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
 	"unicode"
 )
+
+func convertJsonToMap(b []byte) (map[string]json.RawMessage, error) {
+	var m map[string]json.RawMessage
+	if err := json.Unmarshal(b, &m); err != nil {
+		return nil, fmt.Errorf("Failed to convert json to map: %v", err)
+	}
+	return m, nil
+}
+
+// Get error message from API response
+func getErrorText(m map[string]json.RawMessage) string {
+
+	quoted, ok := m["errortext"]
+	if !ok {
+		return ""
+	}
+
+	errortext, err := strconv.Unquote(string(quoted))
+	if err != nil {
+		return string(quoted)
+	}
+	return errortext
+}
+
+func getResponseContent(cmd *Command, resp []byte) (respBody []byte, err error) {
+
+	var ok bool
+
+	respMap, err := convertJsonToMap(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	respBody, ok = respMap[strings.ToLower(cmd.Name)+"response"]
+	if !ok {
+		// some API's response are not ended with "response"
+		respBody, ok = respMap[strings.ToLower(cmd.Name)]
+	}
+	if !ok {
+		if errortext := getErrorText(respMap); errortext != "" {
+			return nil, errors.New(errortext)
+		}
+		return nil, fmt.Errorf(
+			"Unexpected format: response doesn't contain %s or %s or errortext",
+			cmd.Name+"response", cmd.Name)
+	}
+	return respBody, nil
+}
+
+// Get content from API response
+func getObjectJson(cmd *Command, resp []byte, isJobResult bool) (objJson []byte, err error) {
+
+	var respBody []byte
+
+	if isJobResult {
+		respBody = resp
+	} else {
+		respBody, err = getResponseContent(cmd, resp)
+		if err != nil {
+			return nil, err
+		}
+		if cmd.IsAsync {
+			// return jobid
+			return respBody, nil
+		}
+	}
+
+	switch cmd.ObjectType {
+	case "result":
+		return respBody, nil
+	default:
+		respBodyMap, err := convertJsonToMap(respBody)
+		if err != nil {
+			return nil, err
+		}
+
+		objJson, ok := respBodyMap[cmd.ObjectType]
+		if !ok {
+			if errortext := getErrorText(respBodyMap); errortext != "" {
+				return nil, errors.New(errortext)
+			}
+			// respBodyMap can be empty. For example, list api returns nothing.
+			if len(respBodyMap) == 0 {
+				return nil, nil
+			}
+			// Type can be null. For example, destroyvirtualmachine is executed with expunge=true
+			if objJson, ok := respBodyMap["null"]; ok {
+				return objJson, nil
+			}
+			return nil, fmt.Errorf(
+				"Unexpected format: response doesn't contain %s or errortext",
+				cmd.ObjectType)
+		}
+		return objJson, nil
+	}
+}
+
+func (client *Client) convertResponseJsonToObject(cmd *Command, resp []byte, isJobResult bool) (interface{}, error) {
+
+	objJson, err := getObjectJson(cmd, resp, isJobResult)
+	if err != nil {
+		return nil, err
+	}
+
+	p := cmd.Pointer()
+	if objJson == nil {
+		return reflect.ValueOf(p).Elem().Interface(), nil
+	}
+	if err := json.Unmarshal(objJson, p); err != nil {
+		return nil, fmt.Errorf("Failed to convert json to object: %v", err)
+	}
+	obj := reflect.ValueOf(p).Elem().Interface()
+
+	// Set Object's Client field
+	v := reflect.ValueOf(obj)
+	if v.Kind() == reflect.Slice {
+		for i := 0; i < v.Len(); i++ {
+			v.Index(i).Interface().(Resource).setClient(client)
+		}
+	} else if v.Kind() == reflect.Ptr {
+		obj.(Resource).setClient(client)
+	}
+
+	return obj, nil
+}
 
 // convert APIParameter to map[string]interface{}
 func convertParamToMap(p APIParameter) (m map[string]interface{}) {
@@ -32,57 +156,43 @@ func convertParamToMap(p APIParameter) (m map[string]interface{}) {
 	return m
 }
 
-// Get content from API response
-func getContent(command string, response []byte) (content []byte, err error) {
-	var v map[string]json.RawMessage
-	var ok bool
-
-	if err := json.Unmarshal(response, &v); err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal: %s", string(response))
-	}
-
-	command = strings.ToLower(command)
-	content, ok = v[command+"response"]
-	if !ok {
-		content, ok = v[command]
-	}
-	if !ok {
-		return nil, fmt.Errorf("Failed to get content: %s", string(response))
-	}
-	return content, nil
+type LogInResponse struct {
+	Username       NullString `json:"username"`
+	UserId         ID         `json:"userid"`
+	Password       NullString `json:"password"`
+	DomainId       ID         `json:"domainid"`
+	Timeout        NullString `json:"timeout"`
+	Account        NullString `json:"account"`
+	FirstName      NullString `json:"firstname"`
+	LastName       NullString `json:"lastname"`
+	Type           NullString `json:"type"`
+	TimeZone       NullString `json:"timezone"`
+	TimeZoneOffset NullString `json:"timezoneoffset"`
+	SessionKey     NullString `json:"sessionkey"`
 }
 
-// Get error message from API response
-func getErrorText(b []byte) (errortext string) {
-	var v map[string]json.RawMessage
-	var err error
-
-	if err = json.Unmarshal(b, &v); err != nil {
-		fmt.Errorf("Failed to unmarshal: %s", string(b))
-	}
-
-	quotedBytes, ok := v["errortext"]
-	if !ok {
-		return ""
-	}
-
-	quotedStr := string(quotedBytes)
-	errortext, err = strconv.Unquote(quotedStr)
-	if err != nil {
-		return quotedStr
-	}
-	return errortext
+type LogOutResponse struct {
+	Description NullString `json:"description"`
 }
 
-func setClientField(obj interface{}, client *Client) {
-	v := reflect.ValueOf(obj).Elem()
-	if v.Kind() == reflect.Slice {
-		for i := 0; i < v.Len(); i++ {
-			v.Index(i).Elem().FieldByName("Client").Set(reflect.ValueOf(client))
-		}
-	} else if v.Kind() == reflect.Ptr {
-		v.Elem().FieldByName("Client").Set(reflect.ValueOf(client))
-	}
+type AsyncApiResponse struct {
+	Id    ID `json:"id"`
+	JobId ID `json:"jobid"`
+}
+
+type AsyncJobResult struct {
+	AccountId       NullString      `json:"accountid"`
+	Cmd             NullString      `json:"cmd"`
+	Created         NullString      `json:"created"`
+	JobId           ID              `json:"jobid"`
+	JobInstanceId   ID              `json:"jobinstanceid"`
+	JobInstanceType NullString      `json:"jobinstancetype"`
+	JobProcsSatus   NullNumber      `json:"jobprocstatus"`
+	JobResult       json.RawMessage `json:"jobresult"`
+	JobResultCode   NullNumber      `json:"jobresultcode"`
+	JobResultType   NullString      `json:"jobresulttype"`
+	JobStatus       NullNumber      `json:"jobstatus"`
+	UserId          ID              `json:"userid"`
 }
 
 type Client struct {
@@ -114,53 +224,6 @@ func NewClient(endpoint *url.URL, apikey string, secretkey string,
 	}, nil
 }
 
-func (c *Client) Request(command string, params map[string]interface{}) (content []byte, err error) {
-
-	if command != "login" && command != "logout" {
-		if (c.APIKey == "" || c.SecretKey == "") &&
-			(c.Username != "" && c.Password != "") {
-			if err = c.LogIn(); err != nil {
-				log.Println("LogIn failed:", err)
-				return content, err
-			}
-			defer c.LogOut()
-		}
-	}
-
-	queryURL := c.GenerateQueryURL(command, params)
-	log.Println("QueryURL:", queryURL)
-	log.Println("request cookie:", c.HTTPClient.Jar)
-
-	httpReq, _ := http.NewRequest("GET", queryURL, nil)
-	httpResp, err := c.HTTPClient.Do(httpReq)
-
-	if err != nil {
-		log.Println("HTTPClient.Do failed:", err)
-		return content, err
-	}
-	defer httpResp.Body.Close()
-
-	log.Println("statuscode:", httpResp.StatusCode)
-
-	if httpResp.StatusCode != 200 {
-		respBody, _ := ioutil.ReadAll(httpResp.Body)
-		err = errors.New(
-			fmt.Sprintf("StatusCode %d: %s", httpResp.StatusCode, respBody))
-		return content, err
-	}
-
-	respBody, err := ioutil.ReadAll(httpResp.Body)
-	if err != nil {
-		log.Println("ioutil.ReadAll failed:", err)
-		return content, err
-	}
-
-	log.Println("response:", string(respBody))
-	log.Println("cookie:", c.HTTPClient.Jar)
-
-	return getContent(command, respBody)
-}
-
 // Generate Query URL from command and paramters
 func (c *Client) GenerateQueryURL(command string, params map[string]interface{}) string {
 
@@ -172,9 +235,9 @@ func (c *Client) GenerateQueryURL(command string, params map[string]interface{})
 	for k := range params {
 
 		if k == "userdata" {
-			ns, ok := params[k].(NullString)
-			if ok && !ns.IsNil() {
-				s := ns.String()
+			_, ok := params[k]
+			if ok {
+				s := fmt.Sprint(params["userdata"])
 				// There seems to be a issue if base64 encoded string ended with
 				// padding character "="
 				// add space to original string to make result not ended with "="
@@ -212,7 +275,7 @@ func (c *Client) GenerateQueryURL(command string, params map[string]interface{})
 		}
 	}
 
-	// values.Encode sort values by key
+	// You don't have to sort values. values.Encode sort values by key.
 	if c.APIKey != "" && c.SecretKey != "" {
 		values.Add("apikey", c.APIKey)
 		queryStr := values.Encode()
@@ -234,188 +297,167 @@ func (c *Client) GenerateQueryURL(command string, params map[string]interface{})
 	return queryURL.String()
 }
 
-type LogInResponse struct {
-	Username       NullString `json:"username"`
-	UserId         NullString `json:"userid"`
-	Password       NullString `json:"password"`
-	DomainId       NullString `json:"domainid"`
-	Timeout        NullString `json:"timeout"`
-	Account        NullString `json:"account"`
-	FirstName      NullString `json:"firstname"`
-	LastName       NullString `json:"lastname"`
-	Type           NullString `json:"type"`
-	TimeZone       NullString `json:"timezone"`
-	TimeZoneOffset NullString `json:"timezoneoffset"`
-	SessionKey     NullString `json:"sessionkey"`
-}
+func (c *Client) AsyncRequestJson(command string, params map[string]interface{}) (resp []byte, err error) {
+	cmd := getCommand(command)
 
-type LogOutResponse struct {
-	Description NullString `json:"description"`
-}
+	queryURL := c.GenerateQueryURL(cmd.Name, params)
+	log.Println("QueryURL:", queryURL)
+	log.Println("request cookie:", c.HTTPClient.Jar)
 
-func (c *Client) LogIn() error {
-
-	var params map[string]interface{}
-	b, err := c.Request("login", params)
+	httpReq, _ := http.NewRequest("GET", queryURL, nil)
+	httpResp, err := c.HTTPClient.Do(httpReq)
 	if err != nil {
-		log.Println(err)
+		log.Println("HTTPClient.Do failed:", err)
+		return nil, err
+	}
+	defer httpResp.Body.Close()
+
+	resp, err = ioutil.ReadAll(httpResp.Body)
+
+	log.Println("statuscode:", httpResp.StatusCode)
+	log.Println("response:", string(resp))
+	log.Println("cookie:", c.HTTPClient.Jar)
+
+	if httpResp.StatusCode != 200 {
+		return resp, fmt.Errorf("StatusCode %d: %s", httpResp.StatusCode, resp)
+	}
+
+	return resp, err
+}
+
+func (c *Client) AsyncRequest(command string, params map[string]interface{}) (interface{}, error) {
+	cmd := getCommand(command)
+	resp, err := c.AsyncRequestJson(cmd.Name, params)
+	if err != nil {
+		return nil, err
+	}
+	if cmd.IsAsync {
+		var r *AsyncApiResponse
+		respJson, err := getObjectJson(cmd, resp, false)
+		if err != nil {
+			return nil, err
+		}
+		if err = json.Unmarshal(respJson, &r); err != nil {
+			return nil, err
+		}
+		return r, nil
+	}
+	return c.convertResponseJsonToObject(cmd, resp, false)
+}
+
+func (c *Client) RequestJson(command string, params map[string]interface{}) ([]byte, error) {
+	cmd := getCommand(command)
+	if cmd.IsAsync {
+		r, err := c.AsyncRequest(cmd.Name, params)
+		if err != nil {
+			return nil, err
+		}
+		job, err := c.Wait(r.(*AsyncApiResponse).JobId.String())
+		if err != nil {
+			return nil, err
+		}
+		return job.JobResult, nil
+	}
+	return c.AsyncRequestJson(command, params)
+}
+
+func (c *Client) Request(command string, params map[string]interface{}) (interface{}, error) {
+	cmd := getCommand(command)
+	resp, err := c.RequestJson(cmd.Name, params)
+	if err != nil {
+		return nil, err
+	}
+	// If command is Async, pass JobResult.
+	return c.convertResponseJsonToObject(cmd, resp, cmd.IsAsync)
+}
+
+func (c *Client) LogIn() (err error) {
+
+	r, err := c.AsyncRequestJson("login", nil)
+	if err != nil {
+		return err
+	}
+	lr := LogInResponse{}
+	if err = json.Unmarshal(r, &lr); err != nil {
 		return err
 	}
 
-	r := LogInResponse{}
-	err = json.Unmarshal(b, &r)
-	if err != nil {
-		return fmt.Errorf("Failed to unmarshal: %s", string(b))
-	}
-
-	if r.SessionKey.IsNil() {
+	if lr.SessionKey.IsNil() {
 		return errors.New("login API didn't return valid sessionkey.")
 	}
 
-	c.SessionKey = r.SessionKey.String()
+	c.SessionKey = lr.SessionKey.String()
 	return nil
 }
 
 func (c *Client) LogOut() error {
 
-	var params map[string]interface{}
-	b, err := c.Request("logout", params)
-
-	r := LogOutResponse{}
-	err = json.Unmarshal(b, &r)
-	if err != nil {
-		return fmt.Errorf("Failed to unmarshal: %s", string(b))
-	}
-
-	if r.Description.IsNil() || r.Description.String() != "success" {
-		return fmt.Errorf("logout API is failed. description: %v", r.Description)
-	}
-	return nil
-}
-
-// Get API command from Parameter (ex. ListZonesParameter -> listZones)
-func getCommandNameFromParam(param APIParameter) string {
-	paramName := reflect.TypeOf(param).Elem().Name()
-	paramName = strings.ToLower(paramName[0:1]) + paramName[1:]
-	re := regexp.MustCompile("(.*\\.)?([^.]+)Parameter$")
-	return re.ReplaceAllString(paramName, "$2")
-}
-
-// request executes SyncRequest and unmarshals response
-func (c *Client) request(param APIParameter, obj interface{}) error {
-	var content json.RawMessage
-
-	cmdName := getCommandNameFromParam(param)
-	cmd := config.Commands[cmdName]
-	pmap := convertParamToMap(param)
-
-	resp, err := c.SyncRequest(cmdName, pmap)
-	if err != nil {
+	r, err := c.AsyncRequestJson("logout", nil)
+	lr := LogOutResponse{}
+	if err = json.Unmarshal(r, &lr); err != nil {
 		return err
 	}
 
-	if cmd.Object == "result" {
-		content = resp
-	} else {
-		var v map[string]json.RawMessage
-		var ok bool
-
-		err = json.Unmarshal(resp, &v)
-		if err != nil {
-			return fmt.Errorf(
-				"Failed to unmarshal SyncRequest result (%s): %s", err, string(resp))
-		}
-
-		// if destroyvirtualmachine is executed with expunge=true, return nothing
-		if cmdName == "destroyVirtualMachine" {
-			expunge, ok := pmap["expunge"]
-			if ok && expunge.(NullBool).Bool() {
-				content, ok = v["null"]
-				if !ok {
-					errortext, _ := v["errortext"]
-					if ok {
-						return fmt.Errorf(string(errortext))
-					} else {
-						return fmt.Errorf(
-							"Unexpected SyncRequest response format: %s", string(resp))
-					}
-				}
-				return nil
-			}
-		}
-
-		content, ok = v[cmd.Object]
-		if !ok {
-			if len(v) == 0 {
-				return nil
-			}
-			errortext, _ := v["errortext"]
-			if ok {
-				return fmt.Errorf(string(errortext))
-			} else {
-				return fmt.Errorf(
-					"Unexpected SyncRequest response format: response doesn't contain '%s' or 'errortext' %s",
-					cmd.Object, string(resp))
-			}
-		}
+	if lr.Description.String() != "success" {
+		return fmt.Errorf("logout API is failed. description: %v", lr.Description)
 	}
-
-	if err = json.Unmarshal(content, obj); err != nil {
-		return fmt.Errorf(
-			"Failed to unmarshal content (%s): %s", err, string(content))
-	}
-
-	setClientField(obj, c)
-
 	return nil
 }
 
-// SyncRequest executes command and wait for job complettion
-func (c *Client) SyncRequest(command string, params map[string]interface{}) (b []byte, err error) {
-
-	cmd, ok := config.Commands[command]
-	if !ok {
-		return nil, fmt.Errorf("%v : No such command", command)
-	}
-
-	b, err = c.Request(command, params)
-	if !cmd.IsAsync || err != nil {
-		return b, err
-	}
-
-	job := new(AsyncJobResult)
-	if err = json.Unmarshal(b, job); err != nil {
-		return b, fmt.Errorf("Failed to unmarshal: %s", string(b))
-	}
-
-	if job.JobId.IsNil() {
-		return b, errors.New(getErrorText(b))
-	}
-
-	job, err = c.Wait(job.JobId.String())
-	if job == nil || err != nil {
+func (c *Client) QueryAsyncJobResult(jobid string) (job *AsyncJobResult, err error) {
+	resp, err := c.AsyncRequestJson(
+		"queryAsyncJobResult", map[string]interface{}{"jobid": jobid})
+	if err != nil {
 		return nil, err
 	}
-	return job.JobResult, nil
+
+	m, err := convertJsonToMap(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	jobJson, ok := m["queryasyncjobresultresponse"]
+	if !ok {
+		if errortext := getErrorText(m); errortext != "" {
+			return nil, errors.New(errortext)
+		}
+		return nil, fmt.Errorf(
+			"Unexpected format: response doesn't contain queryasyncjobresultresponse or errortext")
+	}
+
+	if err = json.Unmarshal(jobJson, &job); err != nil {
+		return nil, fmt.Errorf("Failed to convert json to AsyncJobResult: %v", err)
+	}
+
+	return job, nil
 }
 
-// Wait waits for job completion
 func (c *Client) Wait(jobid string) (job *AsyncJobResult, err error) {
 
-	p := new(QueryAsyncJobResultParameter)
-	p.JobId.Set(jobid)
-
 	for {
-		job, err = c.QueryAsyncJobResult(p)
+		job, err = c.QueryAsyncJobResult(jobid)
 		if err != nil {
-			return job, err
+			return nil, err
 		}
 
-		if job.JobStatus.IsNil() || job.JobStatus.String() != "0" {
+		if job.JobStatus.String() != "0" {
 			break
 		}
 		time.Sleep(c.PollingInterval * time.Second)
 	}
 
-	return job, err
+	if job.JobStatus.String() != "1" {
+		m, err := convertJsonToMap(job.JobResult)
+		if err != nil {
+			return nil, err
+		}
+		errortext := getErrorText(m)
+		if errortext != "" {
+			return nil, errors.New(errortext)
+		}
+		return nil, fmt.Errorf(
+			"job doesn't finished properly: %s", job.JobStatus.String())
+	}
+
+	return job, nil
 }

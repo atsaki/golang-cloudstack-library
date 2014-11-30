@@ -14,11 +14,34 @@ type APIParameter interface{}
 
 type Resource interface {
 	// refresh information about the resource
-	Refresh() (Resource, error)
+	Refresh() error
 	// update the resource with specified args
-	Update(args map[string]interface{}) (Resource, error)
+	Update(args map[string]interface{}) error
 	// delete the resource
 	Delete() error
+	// set client for this resource
+	setClient(*Client)
+}
+
+type ResourceBase struct {
+	client *Client
+}
+
+func (*ResourceBase) Refresh() error {
+	return errors.New("Not Implemented")
+}
+
+func (*ResourceBase) Update(map[string]interface{}) error {
+	return errors.New("Not Implemented")
+}
+
+func (*ResourceBase) Delete() error {
+	return errors.New("Not Implemented")
+}
+
+func (rb *ResourceBase) setClient(client *Client) {
+	rb.client = new(Client)
+	*rb.client = *client
 }
 
 type Nullable interface {

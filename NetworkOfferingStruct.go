@@ -1,6 +1,7 @@
 package cloudstack
 
 type NetworkOffering struct {
+	ResourceBase
 	// availability of the network offering
 	Availability NullString `json:"availability"`
 	// true if network offering is ip conserve mode enabled
@@ -47,6 +48,4 @@ type NetworkOffering struct {
 	// the traffic type for the network offering, supported types are Public,
 	// Management, Control, Guest, Vlan or Storage.
 	TrafficType NullString `json:"traffictype"`
-	// CloudStack API Client
-	Client *Client
 }

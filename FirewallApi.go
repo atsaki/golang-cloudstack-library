@@ -14,9 +14,12 @@ func NewDeleteEgressFirewallRuleParameter(id string) (p *DeleteEgressFirewallRul
 }
 
 // Deletes an ggress firewall rule
-func (c *Client) DeleteEgressFirewallRule(p *DeleteEgressFirewallRuleParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteEgressFirewallRule(p *DeleteEgressFirewallRuleParameter) (*Result, error) {
+	obj, err := c.Request("deleteEgressFirewallRule", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -33,9 +36,12 @@ func NewDeleteFirewallRuleParameter(id string) (p *DeleteFirewallRuleParameter) 
 }
 
 // Deletes a firewall rule
-func (c *Client) DeleteFirewallRule(p *DeleteFirewallRuleParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteFirewallRule(p *DeleteFirewallRuleParameter) (*Result, error) {
+	obj, err := c.Request("deleteFirewallRule", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -70,9 +76,12 @@ func NewUpdatePortForwardingRuleParameter(id string) (p *UpdatePortForwardingRul
 
 // Updates a port forwarding rule.  Only the private port and the virtual
 // machine can be updated.
-func (c *Client) UpdatePortForwardingRule(p *UpdatePortForwardingRuleParameter) (obj *PortForwardingRule, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdatePortForwardingRule(p *UpdatePortForwardingRuleParameter) (*PortForwardingRule, error) {
+	obj, err := c.Request("updatePortForwardingRule", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*PortForwardingRule), err
 }
 
 
@@ -114,9 +123,12 @@ func NewListPortForwardingRulesParameter() (p *ListPortForwardingRulesParameter)
 }
 
 // Lists all port forwarding rules for an IP address.
-func (c *Client) ListPortForwardingRules(p *ListPortForwardingRulesParameter) (objs []*PortForwardingRule, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListPortForwardingRules(p *ListPortForwardingRulesParameter) ([]*PortForwardingRule, error) {
+	obj, err := c.Request("listPortForwardingRules", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*PortForwardingRule), err
 }
 
 
@@ -164,9 +176,12 @@ func NewCreatePortForwardingRuleParameter(ipaddressid string, privateport int, p
 }
 
 // Creates a port forwarding rule
-func (c *Client) CreatePortForwardingRule(p *CreatePortForwardingRuleParameter) (obj *PortForwardingRule, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreatePortForwardingRule(p *CreatePortForwardingRuleParameter) (*PortForwardingRule, error) {
+	obj, err := c.Request("createPortForwardingRule", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*PortForwardingRule), err
 }
 
 
@@ -200,9 +215,12 @@ func NewCreateEgressFirewallRuleParameter(networkid string, protocol string) (p 
 }
 
 // Creates a egress firewall rule for a given network
-func (c *Client) CreateEgressFirewallRule(p *CreateEgressFirewallRuleParameter) (obj *FirewallRule, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateEgressFirewallRule(p *CreateEgressFirewallRuleParameter) (*FirewallRule, error) {
+	obj, err := c.Request("createEgressFirewallRule", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*FirewallRule), err
 }
 
 
@@ -224,9 +242,12 @@ func NewUpdateEgressFirewallRuleParameter(id string) (p *UpdateEgressFirewallRul
 }
 
 // Updates egress firewall rule
-func (c *Client) UpdateEgressFirewallRule(p *UpdateEgressFirewallRuleParameter) (obj *FirewallRule, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateEgressFirewallRule(p *UpdateEgressFirewallRuleParameter) (*FirewallRule, error) {
+	obj, err := c.Request("updateEgressFirewallRule", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*FirewallRule), err
 }
 
 
@@ -243,9 +264,12 @@ func NewDeletePortForwardingRuleParameter(id string) (p *DeletePortForwardingRul
 }
 
 // Deletes a port forwarding rule
-func (c *Client) DeletePortForwardingRule(p *DeletePortForwardingRuleParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeletePortForwardingRule(p *DeletePortForwardingRuleParameter) (*Result, error) {
+	obj, err := c.Request("deletePortForwardingRule", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -287,9 +311,12 @@ func NewListFirewallRulesParameter() (p *ListFirewallRulesParameter) {
 }
 
 // Lists all firewall rules for an IP address.
-func (c *Client) ListFirewallRules(p *ListFirewallRulesParameter) (objs []*FirewallRule, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListFirewallRules(p *ListFirewallRulesParameter) ([]*FirewallRule, error) {
+	obj, err := c.Request("listFirewallRules", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*FirewallRule), err
 }
 
 
@@ -311,9 +338,12 @@ func NewUpdateFirewallRuleParameter(id string) (p *UpdateFirewallRuleParameter) 
 }
 
 // Updates firewall rule
-func (c *Client) UpdateFirewallRule(p *UpdateFirewallRuleParameter) (obj *FirewallRule, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateFirewallRule(p *UpdateFirewallRuleParameter) (*FirewallRule, error) {
+	obj, err := c.Request("updateFirewallRule", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*FirewallRule), err
 }
 
 
@@ -347,9 +377,12 @@ func NewCreateFirewallRuleParameter(ipaddressid string, protocol string) (p *Cre
 }
 
 // Creates a firewall rule for a given ip address
-func (c *Client) CreateFirewallRule(p *CreateFirewallRuleParameter) (obj *FirewallRule, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateFirewallRule(p *CreateFirewallRuleParameter) (*FirewallRule, error) {
+	obj, err := c.Request("createFirewallRule", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*FirewallRule), err
 }
 
 
@@ -391,8 +424,11 @@ func NewListEgressFirewallRulesParameter() (p *ListEgressFirewallRulesParameter)
 }
 
 // Lists all egress firewall rules for network id.
-func (c *Client) ListEgressFirewallRules(p *ListEgressFirewallRulesParameter) (objs []*FirewallRule, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListEgressFirewallRules(p *ListEgressFirewallRulesParameter) ([]*FirewallRule, error) {
+	obj, err := c.Request("listEgressFirewallRules", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*FirewallRule), err
 }
 

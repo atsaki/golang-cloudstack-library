@@ -1,6 +1,7 @@
 package cloudstack
 
 type Template struct {
+	ResourceBase
 	// the account name to which the template belongs
 	Account NullString `json:"account"`
 	// the account id to which the template belongs
@@ -74,6 +75,4 @@ type Template struct {
 	ZoneId ID `json:"zoneid"`
 	// the name of the zone for this template
 	ZoneName NullString `json:"zonename"`
-	// CloudStack API Client
-	Client *Client
 }

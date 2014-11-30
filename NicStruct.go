@@ -1,6 +1,7 @@
 package cloudstack
 
 type Nic struct {
+	ResourceBase
 	// the broadcast uri of the nic
 	BroadcastUri NullString `json:"broadcasturi"`
 	// device id for the network when plugged into the virtual machine
@@ -37,6 +38,4 @@ type Nic struct {
 	Type NullString `json:"type"`
 	// Id of the vm to which the nic belongs
 	VirtualMachineId ID `json:"virtualmachineid"`
-	// CloudStack API Client
-	Client *Client
 }

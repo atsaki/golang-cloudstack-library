@@ -38,9 +38,12 @@ func NewAuthorizeSecurityGroupIngressParameter() (p *AuthorizeSecurityGroupIngre
 }
 
 // Authorizes a particular ingress rule for this security group
-func (c *Client) AuthorizeSecurityGroupIngress(p *AuthorizeSecurityGroupIngressParameter) (obj *SecurityGroupIngress, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) AuthorizeSecurityGroupIngress(p *AuthorizeSecurityGroupIngressParameter) (*SecurityGroupIngress, error) {
+	obj, err := c.Request("authorizeSecurityGroupIngress", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*SecurityGroupIngress), err
 }
 
 
@@ -66,9 +69,12 @@ func NewCreateSecurityGroupParameter(name string) (p *CreateSecurityGroupParamet
 }
 
 // Creates a security group
-func (c *Client) CreateSecurityGroup(p *CreateSecurityGroupParameter) (obj *SecurityGroup, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateSecurityGroup(p *CreateSecurityGroupParameter) (*SecurityGroup, error) {
+	obj, err := c.Request("createSecurityGroup", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*SecurityGroup), err
 }
 
 
@@ -85,9 +91,12 @@ func NewRevokeSecurityGroupEgressParameter(id string) (p *RevokeSecurityGroupEgr
 }
 
 // Deletes a particular egress rule from this security group
-func (c *Client) RevokeSecurityGroupEgress(p *RevokeSecurityGroupEgressParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) RevokeSecurityGroupEgress(p *RevokeSecurityGroupEgressParameter) (*Result, error) {
+	obj, err := c.Request("revokeSecurityGroupEgress", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -111,9 +120,12 @@ func NewDeleteSecurityGroupParameter() (p *DeleteSecurityGroupParameter) {
 }
 
 // Deletes security group
-func (c *Client) DeleteSecurityGroup(p *DeleteSecurityGroupParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteSecurityGroup(p *DeleteSecurityGroupParameter) (*Result, error) {
+	obj, err := c.Request("deleteSecurityGroup", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -154,9 +166,12 @@ func NewAuthorizeSecurityGroupEgressParameter() (p *AuthorizeSecurityGroupEgress
 }
 
 // Authorizes a particular egress rule for this security group
-func (c *Client) AuthorizeSecurityGroupEgress(p *AuthorizeSecurityGroupEgressParameter) (obj *SecurityGroupEgress, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) AuthorizeSecurityGroupEgress(p *AuthorizeSecurityGroupEgressParameter) (*SecurityGroupEgress, error) {
+	obj, err := c.Request("authorizeSecurityGroupEgress", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*SecurityGroupEgress), err
 }
 
 
@@ -195,9 +210,12 @@ func NewListSecurityGroupsParameter() (p *ListSecurityGroupsParameter) {
 }
 
 // Lists security groups
-func (c *Client) ListSecurityGroups(p *ListSecurityGroupsParameter) (objs []*SecurityGroup, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListSecurityGroups(p *ListSecurityGroupsParameter) ([]*SecurityGroup, error) {
+	obj, err := c.Request("listSecurityGroups", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*SecurityGroup), err
 }
 
 
@@ -214,8 +232,11 @@ func NewRevokeSecurityGroupIngressParameter(id string) (p *RevokeSecurityGroupIn
 }
 
 // Deletes a particular ingress rule from this security group
-func (c *Client) RevokeSecurityGroupIngress(p *RevokeSecurityGroupIngressParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) RevokeSecurityGroupIngress(p *RevokeSecurityGroupIngressParameter) (*Result, error) {
+	obj, err := c.Request("revokeSecurityGroupIngress", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 

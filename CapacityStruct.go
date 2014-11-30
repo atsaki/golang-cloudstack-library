@@ -1,6 +1,7 @@
 package cloudstack
 
 type Capacity struct {
+	ResourceBase
 	// the total capacity available
 	CapacityTotal NullNumber `json:"capacitytotal"`
 	// the capacity currently in use
@@ -21,6 +22,4 @@ type Capacity struct {
 	ZoneId ID `json:"zoneid"`
 	// the Zone name
 	ZoneName NullString `json:"zonename"`
-	// CloudStack API Client
-	Client *Client
 }

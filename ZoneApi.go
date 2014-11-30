@@ -14,9 +14,12 @@ func NewDeleteZoneParameter(id string) (p *DeleteZoneParameter) {
 }
 
 // Deletes a Zone.
-func (c *Client) DeleteZone(p *DeleteZoneParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteZone(p *DeleteZoneParameter) (*Result, error) {
+	obj, err := c.Request("deleteZone", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -64,9 +67,12 @@ func NewUpdateZoneParameter(id string) (p *UpdateZoneParameter) {
 }
 
 // Updates a Zone.
-func (c *Client) UpdateZone(p *UpdateZoneParameter) (obj *Zone, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateZone(p *UpdateZoneParameter) (*Zone, error) {
+	obj, err := c.Request("updateZone", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Zone), err
 }
 
 
@@ -112,9 +118,12 @@ func NewCreateZoneParameter(dns1 string, internaldns1 string, name string, netwo
 }
 
 // Creates a Zone.
-func (c *Client) CreateZone(p *CreateZoneParameter) (obj *Zone, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateZone(p *CreateZoneParameter) (*Zone, error) {
+	obj, err := c.Request("createZone", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Zone), err
 }
 
 
@@ -147,8 +156,11 @@ func NewListZonesParameter() (p *ListZonesParameter) {
 }
 
 // Lists zones
-func (c *Client) ListZones(p *ListZonesParameter) (objs []*Zone, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListZones(p *ListZonesParameter) ([]*Zone, error) {
+	obj, err := c.Request("listZones", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*Zone), err
 }
 

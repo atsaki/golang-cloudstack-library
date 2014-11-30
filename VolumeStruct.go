@@ -1,6 +1,7 @@
 package cloudstack
 
 type Volume struct {
+	ResourceBase
 	// the account associated with the disk volume
 	Account NullString `json:"account"`
 	// the date the volume was attached to a VM instance
@@ -104,6 +105,4 @@ type Volume struct {
 	ZoneId ID `json:"zoneid"`
 	// name of the availability zone
 	ZoneName NullString `json:"zonename"`
-	// CloudStack API Client
-	Client *Client
 }

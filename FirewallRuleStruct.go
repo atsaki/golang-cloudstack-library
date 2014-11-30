@@ -1,6 +1,7 @@
 package cloudstack
 
 type FirewallRule struct {
+	ResourceBase
 	// the cidr list to forward traffic from
 	CidrList NullString `json:"cidrlist"`
 	// the ending port of firewall rule's port range
@@ -27,6 +28,4 @@ type FirewallRule struct {
 	State NullString `json:"state"`
 	// the list of resource tags associated with the rule
 	Tags []Tag `json:"tags"`
-	// CloudStack API Client
-	Client *Client
 }

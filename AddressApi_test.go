@@ -76,7 +76,7 @@ func TestAssociateIpAddress(t *testing.T) {
 		t.Errorf("ipaddress: actual %s, expected 1.1.1.1", ip.IpAddress.String())
 	}
 
-	if ip.Client.EndPoint != endpoint {
-		t.Errorf("endpoint: actual %v, expected %v", ip.Client.EndPoint, endpoint)
+	if ip.client.EndPoint != endpoint {
+		t.Errorf("endpoint: actual %v, expected %v", ip.client.EndPoint, endpoint)
 	}
 }

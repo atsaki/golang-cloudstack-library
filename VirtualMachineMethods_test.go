@@ -123,23 +123,32 @@ func TestVirtualMachineMethods(t *testing.T) {
 		t.Errorf("length: actual %d, expected 1", len(vms))
 	}
 
+	// Check VirtualMachine implements Resource
 	var r Resource
+	r = vms[0]
 
-	r, err = vms[0].Refresh()
-	vm := r.(*VirtualMachine)
+	vm := new(VirtualMachine)
+	*vm = *(r.(*VirtualMachine))
 
-	if err != nil {
+	// modify original value
+	vm.Nic[0].IpAddress.Set("8.8.8.8")
+	if vm.Nic[0].IpAddress.String() != "8.8.8.8" {
+		t.Errorf("ipaddress: actual %s, expected 8.8.8.8", vm.Nic[0].IpAddress.String())
+	}
+
+	if err = vm.Refresh(); err != nil {
 		t.Error(err)
 	}
 
 	if len(vm.Nic) != 1 {
 		t.Errorf("nic length: actual %d, expected 1", len(vms))
 	}
+	// check original value is restored
 	if vm.Nic[0].IpAddress.String() != "10.3.0.2" {
 		t.Errorf("ipaddress: actual %s, expected 10.3.0.2", vm.Nic[0].IpAddress.String())
 	}
-	if vm.Client.EndPoint != endpoint {
-		t.Errorf("endpoint: actual %v, expected %v", vms[0].Client.EndPoint, endpoint)
+	if vm.client.EndPoint != endpoint {
+		t.Errorf("endpoint: actual %v, expected %v", vms[0].client.EndPoint, endpoint)
 	}
 
 	if err = vm.Delete(); err != nil {

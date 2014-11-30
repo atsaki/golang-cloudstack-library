@@ -57,9 +57,12 @@ func NewListPublicIpAddressesParameter() (p *ListPublicIpAddressesParameter) {
 }
 
 // Lists all public ip addresses
-func (c *Client) ListPublicIpAddresses(p *ListPublicIpAddressesParameter) (objs []*PublicIpAddress, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListPublicIpAddresses(p *ListPublicIpAddressesParameter) ([]*PublicIpAddress, error) {
+	obj, err := c.Request("listPublicIpAddresses", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*PublicIpAddress), err
 }
 
 
@@ -81,9 +84,12 @@ func NewUpdateIpAddressParameter(id string) (p *UpdateIpAddressParameter) {
 }
 
 // Updates an ip address
-func (c *Client) UpdateIpAddress(p *UpdateIpAddressParameter) (obj *PublicIpAddress, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateIpAddress(p *UpdateIpAddressParameter) (*PublicIpAddress, error) {
+	obj, err := c.Request("updateIpAddress", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*PublicIpAddress), err
 }
 
 
@@ -100,9 +106,12 @@ func NewDisassociateIpAddressParameter(id string) (p *DisassociateIpAddressParam
 }
 
 // Disassociates an ip address from the account.
-func (c *Client) DisassociateIpAddress(p *DisassociateIpAddressParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DisassociateIpAddress(p *DisassociateIpAddressParameter) (*Result, error) {
+	obj, err := c.Request("disassociateIpAddress", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -135,8 +144,11 @@ func NewAssociateIpAddressParameter() (p *AssociateIpAddressParameter) {
 }
 
 // Acquires and associates a public IP to an account.
-func (c *Client) AssociateIpAddress(p *AssociateIpAddressParameter) (obj *PublicIpAddress, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) AssociateIpAddress(p *AssociateIpAddressParameter) (*PublicIpAddress, error) {
+	obj, err := c.Request("associateIpAddress", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*PublicIpAddress), err
 }
 

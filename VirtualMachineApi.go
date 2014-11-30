@@ -19,9 +19,12 @@ func NewAddNicToVirtualMachineParameter(networkid string, virtualmachineid strin
 }
 
 // Adds VM to specified network by creating a NIC
-func (c *Client) AddNicToVirtualMachine(p *AddNicToVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) AddNicToVirtualMachine(p *AddNicToVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("addNicToVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -38,9 +41,12 @@ func NewGetVMPasswordParameter(id string) (p *GetVMPasswordParameter) {
 }
 
 // Returns an encrypted password for the VM
-func (c *Client) GetVMPassword(p *GetVMPasswordParameter) (obj *VMPassword, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) GetVMPassword(p *GetVMPasswordParameter) (*VMPassword, error) {
+	obj, err := c.Request("getVMPassword", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VMPassword), err
 }
 
 
@@ -54,9 +60,12 @@ func NewCleanVMReservationsParameter() (p *CleanVMReservationsParameter) {
 }
 
 // Cleanups VM reservations in the database.
-func (c *Client) CleanVMReservations(p *CleanVMReservationsParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CleanVMReservations(p *CleanVMReservationsParameter) (*Result, error) {
+	obj, err := c.Request("cleanVMReservations", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -73,9 +82,12 @@ func NewRecoverVirtualMachineParameter(id string) (p *RecoverVirtualMachineParam
 }
 
 // Recovers a virtual machine.
-func (c *Client) RecoverVirtualMachine(p *RecoverVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) RecoverVirtualMachine(p *RecoverVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("recoverVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -179,9 +191,12 @@ func NewDeployVirtualMachineParameter(serviceofferingid string, templateid strin
 
 // Creates and automatically starts a virtual machine based on a service
 // offering, disk offering, and template.
-func (c *Client) DeployVirtualMachine(p *DeployVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeployVirtualMachine(p *DeployVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("deployVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -198,9 +213,12 @@ func NewExpungeVirtualMachineParameter(id string) (p *ExpungeVirtualMachineParam
 }
 
 // Expunge a virtual machine. Once expunged, it cannot be recoverd.
-func (c *Client) ExpungeVirtualMachine(p *ExpungeVirtualMachineParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) ExpungeVirtualMachine(p *ExpungeVirtualMachineParameter) (*Result, error) {
+	obj, err := c.Request("expungeVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -223,9 +241,12 @@ func NewScaleVirtualMachineParameter(id string, serviceofferingid string) (p *Sc
 }
 
 // Scales the virtual machine to a new service offering.
-func (c *Client) ScaleVirtualMachine(p *ScaleVirtualMachineParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) ScaleVirtualMachine(p *ScaleVirtualMachineParameter) (*Result, error) {
+	obj, err := c.Request("scaleVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -242,9 +263,12 @@ func NewRebootVirtualMachineParameter(id string) (p *RebootVirtualMachineParamet
 }
 
 // Reboots a virtual machine.
-func (c *Client) RebootVirtualMachine(p *RebootVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) RebootVirtualMachine(p *RebootVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("rebootVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -264,9 +288,12 @@ func NewRemoveNicFromVirtualMachineParameter(nicid string, virtualmachineid stri
 }
 
 // Removes VM from specified network by deleting a NIC
-func (c *Client) RemoveNicFromVirtualMachine(p *RemoveNicFromVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) RemoveNicFromVirtualMachine(p *RemoveNicFromVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("removeNicFromVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -286,9 +313,12 @@ func NewUpdateDefaultNicForVirtualMachineParameter(nicid string, virtualmachinei
 }
 
 // Changes the default NIC on a VM
-func (c *Client) UpdateDefaultNicForVirtualMachine(p *UpdateDefaultNicForVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateDefaultNicForVirtualMachine(p *UpdateDefaultNicForVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("updateDefaultNicForVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -307,9 +337,12 @@ func NewResetPasswordForVirtualMachineParameter(id string) (p *ResetPasswordForV
 // Resets the password for virtual machine. The virtual machine must be in a
 // "Stopped" state and the template must already support this feature for this
 // command to take effect. [async]
-func (c *Client) ResetPasswordForVirtualMachine(p *ResetPasswordForVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) ResetPasswordForVirtualMachine(p *ResetPasswordForVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("resetPasswordForVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -333,9 +366,12 @@ func NewChangeServiceForVirtualMachineParameter(id string, serviceofferingid str
 
 // Changes the service offering for a virtual machine. The virtual machine must
 // be in a "Stopped" state for this command to take effect.
-func (c *Client) ChangeServiceForVirtualMachine(p *ChangeServiceForVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) ChangeServiceForVirtualMachine(p *ChangeServiceForVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("changeServiceForVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -357,9 +393,12 @@ func NewStartVirtualMachineParameter(id string) (p *StartVirtualMachineParameter
 }
 
 // Starts a virtual machine.
-func (c *Client) StartVirtualMachine(p *StartVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) StartVirtualMachine(p *StartVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("startVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -383,9 +422,12 @@ func NewMigrateVirtualMachineParameter(virtualmachineid string) (p *MigrateVirtu
 
 // Attempts Migration of a VM to a different host or Root volume of the vm to a
 // different storage pool
-func (c *Client) MigrateVirtualMachine(p *MigrateVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) MigrateVirtualMachine(p *MigrateVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("migrateVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -420,9 +462,12 @@ func NewAssignVirtualMachineParameter(account string, domainid string, virtualma
 // A root administrator can reassign a VM from any account to any other account
 // in any domain. A domain administrator can reassign a VM to any account in the
 // same domain.
-func (c *Client) AssignVirtualMachine(p *AssignVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) AssignVirtualMachine(p *AssignVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("assignVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -467,9 +512,12 @@ func NewUpdateVirtualMachineParameter(id string) (p *UpdateVirtualMachineParamet
 // restarted for the new properties to take effect. UpdateVirtualMachine does
 // not first check whether the VM is stopped. Therefore, stop the VM manually
 // before issuing this call.
-func (c *Client) UpdateVirtualMachine(p *UpdateVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateVirtualMachine(p *UpdateVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("updateVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -489,9 +537,12 @@ func NewRestoreVirtualMachineParameter(virtualmachineid string) (p *RestoreVirtu
 }
 
 // Restore a VM to original template/ISO or new template/ISO
-func (c *Client) RestoreVirtualMachine(p *RestoreVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) RestoreVirtualMachine(p *RestoreVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("restoreVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -513,9 +564,12 @@ func NewMigrateVirtualMachineWithVolumeParameter(hostid string, virtualmachineid
 }
 
 // Attempts Migration of a VM with its volumes to a different host
-func (c *Client) MigrateVirtualMachineWithVolume(p *MigrateVirtualMachineWithVolumeParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) MigrateVirtualMachineWithVolume(p *MigrateVirtualMachineWithVolumeParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("migrateVirtualMachineWithVolume", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -535,9 +589,12 @@ func NewStopVirtualMachineParameter(id string) (p *StopVirtualMachineParameter) 
 }
 
 // Stops a virtual machine.
-func (c *Client) StopVirtualMachine(p *StopVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) StopVirtualMachine(p *StopVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("stopVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -558,9 +615,12 @@ func NewDestroyVirtualMachineParameter(id string) (p *DestroyVirtualMachineParam
 
 // Destroys a virtual machine. Once destroyed, only the administrator can
 // recover it.
-func (c *Client) DestroyVirtualMachine(p *DestroyVirtualMachineParameter) (obj *VirtualMachine, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DestroyVirtualMachine(p *DestroyVirtualMachineParameter) (*VirtualMachine, error) {
+	obj, err := c.Request("destroyVirtualMachine", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachine), err
 }
 
 
@@ -635,8 +695,11 @@ func NewListVirtualMachinesParameter() (p *ListVirtualMachinesParameter) {
 }
 
 // List the virtual machines owned by the account.
-func (c *Client) ListVirtualMachines(p *ListVirtualMachinesParameter) (objs []*VirtualMachine, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListVirtualMachines(p *ListVirtualMachinesParameter) ([]*VirtualMachine, error) {
+	obj, err := c.Request("listVirtualMachines", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*VirtualMachine), err
 }
 

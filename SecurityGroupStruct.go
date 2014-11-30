@@ -1,6 +1,7 @@
 package cloudstack
 
 type SecurityGroup struct {
+	ResourceBase
 	// the account owning the security group
 	Account NullString `json:"account"`
 	// the description of the security group
@@ -23,6 +24,4 @@ type SecurityGroup struct {
 	ProjectId ID `json:"projectid"`
 	// the list of resource tags associated with the rule
 	Tags []Tag `json:"tags"`
-	// CloudStack API Client
-	Client *Client
 }

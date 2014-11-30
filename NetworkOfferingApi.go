@@ -52,9 +52,12 @@ func NewListNetworkOfferingsParameter() (p *ListNetworkOfferingsParameter) {
 }
 
 // Lists all available network offerings.
-func (c *Client) ListNetworkOfferings(p *ListNetworkOfferingsParameter) (objs []*NetworkOffering, err error) {
-	err = c.request(p, &objs)
-	return objs, err
+func (c *Client) ListNetworkOfferings(p *ListNetworkOfferingsParameter) ([]*NetworkOffering, error) {
+	obj, err := c.Request("listNetworkOfferings", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*NetworkOffering), err
 }
 
 
@@ -71,9 +74,12 @@ func NewDeleteNetworkOfferingParameter(id string) (p *DeleteNetworkOfferingParam
 }
 
 // Deletes a network offering.
-func (c *Client) DeleteNetworkOffering(p *DeleteNetworkOfferingParameter) (obj *Result, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) DeleteNetworkOffering(p *DeleteNetworkOfferingParameter) (*Result, error) {
+	obj, err := c.Request("deleteNetworkOffering", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*Result), err
 }
 
 
@@ -138,9 +144,12 @@ func NewCreateNetworkOfferingParameter(displaytext string, guestiptype string, n
 }
 
 // Creates a network offering.
-func (c *Client) CreateNetworkOffering(p *CreateNetworkOfferingParameter) (obj *NetworkOffering, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) CreateNetworkOffering(p *CreateNetworkOfferingParameter) (*NetworkOffering, error) {
+	obj, err := c.Request("createNetworkOffering", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*NetworkOffering), err
 }
 
 
@@ -173,8 +182,11 @@ func NewUpdateNetworkOfferingParameter() (p *UpdateNetworkOfferingParameter) {
 }
 
 // Updates a network offering.
-func (c *Client) UpdateNetworkOffering(p *UpdateNetworkOfferingParameter) (obj *NetworkOffering, err error) {
-	err = c.request(p, &obj)
-	return obj, err
+func (c *Client) UpdateNetworkOffering(p *UpdateNetworkOfferingParameter) (*NetworkOffering, error) {
+	obj, err := c.Request("updateNetworkOffering", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*NetworkOffering), err
 }
 

@@ -1,6 +1,7 @@
 package cloudstack
 
 type Network struct {
+	ResourceBase
 	// the owner of the network
 	Account NullString `json:"account"`
 	// ACL Id associated with the VPC network
@@ -101,6 +102,4 @@ type Network struct {
 	// If a network is enabled for 'streched l2 subnet' then represents zones on
 	// which network currently spans
 	ZonesNetworkspans []NullString `json:"zonesnetworkspans"`
-	// CloudStack API Client
-	Client *Client
 }

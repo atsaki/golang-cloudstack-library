@@ -1,6 +1,7 @@
 package cloudstack
 
 type VirtualMachine struct {
+	ResourceBase
 	// the account associated with the virtual machine
 	Account NullString `json:"account"`
 	// list of affinity groups associated with the virtual machine
@@ -121,6 +122,4 @@ type VirtualMachine struct {
 	ZoneId ID `json:"zoneid"`
 	// the name of the availability zone for the virtual machine
 	ZoneName NullString `json:"zonename"`
-	// CloudStack API Client
-	Client *Client
 }

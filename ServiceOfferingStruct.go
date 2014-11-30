@@ -1,6 +1,7 @@
 package cloudstack
 
 type ServiceOffering struct {
+	ResourceBase
 	// the number of CPU
 	CpuNumber NullNumber `json:"cpunumber"`
 	// the clock rate CPU speed in Mhz
@@ -63,6 +64,4 @@ type ServiceOffering struct {
 	SystemVmType NullString `json:"systemvmtype"`
 	// the tags for the service offering
 	Tags NullString `json:"tags"`
-	// CloudStack API Client
-	Client *Client
 }
