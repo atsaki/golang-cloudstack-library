@@ -340,6 +340,14 @@ func (c *Client) AsyncRequest(command string, params map[string]interface{}) (in
 		if err = json.Unmarshal(respJson, &r); err != nil {
 			return nil, err
 		}
+		if r.JobId.IsNil() {
+			m, _ := convertJsonToMap(respJson)
+			errortext := getErrorText(m)
+			if errortext != "" {
+				return nil, errors.New(errortext)
+			}
+			return nil, fmt.Errorf("No jobid returned. %s", string(respJson))
+		}
 		return r, nil
 	}
 	return c.convertResponseJsonToObject(cmd, resp, false)
