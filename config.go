@@ -73,11 +73,14 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*LoadBalancerRule{})
 		}
 		return reflect.TypeOf(&LoadBalancerRule{})
+<<<<<<< HEAD
 	case "loadbalancerrule":
 		if cmd.IsList {
 			return reflect.TypeOf([]*LoadBalancerRule{})
 		}
 		return reflect.TypeOf(&LoadBalancerRule{})
+=======
+>>>>>>> e3c9ecefd05503ecb4df3f85d6f10b03078f1b84
 	case "networkoffering":
 		if cmd.IsList {
 			return reflect.TypeOf([]*NetworkOffering{})
@@ -2206,7 +2209,7 @@ func getCommand(name string) *Command {
 			Name:       "listLoadBalancerRules",
 			IsAsync:    false,
 			IsList:     true,
-			ObjectType: "loadbalancerrule",
+			ObjectType: "loadbalancer",
 		}
 	case "listloadbalancers":
 		return &Command{
