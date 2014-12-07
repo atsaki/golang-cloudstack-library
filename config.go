@@ -23,7 +23,12 @@ type Command struct {
 }
 
 func (cmd Command) Pointer() interface{} {
-	return reflect.New(cmd.ReflectType()).Interface()
+	refType := cmd.ReflectType()
+	refTypeKind := reflect.ValueOf(refType).Kind()
+	if refTypeKind != reflect.Ptr && refTypeKind != reflect.Slice {
+		return nil
+	}
+	return reflect.New(refType).Interface()
 }
 
 func (cmd Command) ReflectType() reflect.Type {
@@ -63,6 +68,16 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*IpForwardingRule{})
 		}
 		return reflect.TypeOf(&IpForwardingRule{})
+	case "loadbalancer":
+		if cmd.IsList {
+			return reflect.TypeOf([]*LoadBalancerRule{})
+		}
+		return reflect.TypeOf(&LoadBalancerRule{})
+	case "loadbalancerrule":
+		if cmd.IsList {
+			return reflect.TypeOf([]*LoadBalancerRule{})
+		}
+		return reflect.TypeOf(&LoadBalancerRule{})
 	case "networkoffering":
 		if cmd.IsList {
 			return reflect.TypeOf([]*NetworkOffering{})
@@ -756,7 +771,7 @@ func getCommand(name string) *Command {
 			Name:       "createLoadBalancerRule",
 			IsAsync:    true,
 			IsList:     false,
-			ObjectType: "loadbalancerrule",
+			ObjectType: "loadbalancer",
 		}
 	case "createnetwork":
 		return &Command{
@@ -3325,7 +3340,7 @@ func getCommand(name string) *Command {
 			Name:       "updateLoadBalancerRule",
 			IsAsync:    true,
 			IsList:     false,
-			ObjectType: "loadbalancerrule",
+			ObjectType: "loadbalancer",
 		}
 	case "updatenetwork":
 		return &Command{
