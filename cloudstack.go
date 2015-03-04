@@ -13,6 +13,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -275,10 +276,21 @@ func (c *Client) GenerateQueryURL(command string, params map[string]interface{})
 		}
 	}
 
-	// You don't have to sort values. values.Encode sort values by key.
 	if c.APIKey != "" && c.SecretKey != "" {
 		values.Add("apikey", c.APIKey)
-		queryStr := values.Encode()
+
+		// queryStr must not be URL encoded.  You can't use values.Encode.
+		keys := make([]string, 0, len(values))
+		for k := range values {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		params := make([]string, 0, len(keys))
+		for _, k := range keys {
+			params = append(params, fmt.Sprintf("%s=%s", k, values[k][0]))
+		}
+		queryStr := strings.Join(params, "&")
+
 		mac := hmac.New(sha1.New, []byte(c.SecretKey))
 		mac.Write([]byte(
 			strings.ToLower(strings.Replace(queryStr, "+", "%20", -1))))
