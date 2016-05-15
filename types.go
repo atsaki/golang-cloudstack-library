@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"code.google.com/p/go-uuid/uuid"
+	"github.com/pborman/uuid"
 )
 
 type APIParameter interface{}
