@@ -48,6 +48,11 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*Capacity{})
 		}
 		return reflect.TypeOf(&Capacity{})
+	case "dedicatedhost":
+		if cmd.IsList {
+			return reflect.TypeOf([]*DedicatedHost{})
+		}
+		return reflect.TypeOf(&DedicatedHost{})
 	case "diskoffering":
 		if cmd.IsList {
 			return reflect.TypeOf([]*DiskOffering{})
@@ -58,6 +63,16 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*FirewallRule{})
 		}
 		return reflect.TypeOf(&FirewallRule{})
+	case "host":
+		if cmd.IsList {
+			return reflect.TypeOf([]*Host{})
+		}
+		return reflect.TypeOf(&Host{})
+	case "hosttag":
+		if cmd.IsList {
+			return reflect.TypeOf([]*HostTag{})
+		}
+		return reflect.TypeOf(&HostTag{})
 	case "ipaddress":
 		if cmd.IsList {
 			return reflect.TypeOf([]*PublicIpAddress{})
@@ -1030,7 +1045,7 @@ func getCommand(name string) *Command {
 			Name:       "dedicateHost",
 			IsAsync:    true,
 			IsList:     false,
-			ObjectType: "host",
+			ObjectType: "dedicatedhost",
 		}
 	case "dedicatepod":
 		return &Command{
@@ -2102,6 +2117,13 @@ func getCommand(name string) *Command {
 			IsAsync:    false,
 			IsList:     true,
 			ObjectType: "host",
+		}
+	case "listhosttags":
+		return &Command{
+			Name:       "listHostTags",
+			IsAsync:    false,
+			IsList:     true,
+			ObjectType: "hosttag",
 		}
 	case "listhypervisorcapabilities":
 		return &Command{
