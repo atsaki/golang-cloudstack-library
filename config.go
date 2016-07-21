@@ -73,6 +73,11 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*DiskOffering{})
 		}
 		return reflect.TypeOf(&DiskOffering{})
+	case "domain":
+		if cmd.IsList {
+			return reflect.TypeOf([]*Domain{})
+		}
+		return reflect.TypeOf(&Domain{})
 	case "firewallrule":
 		if cmd.IsList {
 			return reflect.TypeOf([]*FirewallRule{})
@@ -2067,7 +2072,7 @@ func getCommand(name string) *Command {
 			Name:       "listDomainChildren",
 			IsAsync:    false,
 			IsList:     true,
-			ObjectType: "domainchildren",
+			ObjectType: "domain",
 		}
 	case "listdomains":
 		return &Command{
