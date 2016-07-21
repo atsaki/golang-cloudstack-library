@@ -48,11 +48,26 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*Capacity{})
 		}
 		return reflect.TypeOf(&Capacity{})
+	case "cluster":
+		if cmd.IsList {
+			return reflect.TypeOf([]*Cluster{})
+		}
+		return reflect.TypeOf(&Cluster{})
+	case "dedicatedcluster":
+		if cmd.IsList {
+			return reflect.TypeOf([]*DedicatedCluster{})
+		}
+		return reflect.TypeOf(&DedicatedCluster{})
 	case "dedicatedhost":
 		if cmd.IsList {
 			return reflect.TypeOf([]*DedicatedHost{})
 		}
 		return reflect.TypeOf(&DedicatedHost{})
+	case "dedicatedpod":
+		if cmd.IsList {
+			return reflect.TypeOf([]*DedicatedPod{})
+		}
+		return reflect.TypeOf(&DedicatedPod{})
 	case "diskoffering":
 		if cmd.IsList {
 			return reflect.TypeOf([]*DiskOffering{})
@@ -123,6 +138,11 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*Nic{})
 		}
 		return reflect.TypeOf(&Nic{})
+	case "pod":
+		if cmd.IsList {
+			return reflect.TypeOf([]*Pod{})
+		}
+		return reflect.TypeOf(&Pod{})
 	case "portforwardingrule":
 		if cmd.IsList {
 			return reflect.TypeOf([]*PortForwardingRule{})
