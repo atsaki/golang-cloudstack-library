@@ -98,6 +98,11 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*IpForwardingRule{})
 		}
 		return reflect.TypeOf(&IpForwardingRule{})
+	case "ldapuser":
+		if cmd.IsList {
+			return reflect.TypeOf([]*LdapUser{})
+		}
+		return reflect.TypeOf(&LdapUser{})
 	case "loadbalancer":
 		if cmd.IsList {
 			return reflect.TypeOf([]*LoadBalancerRule{})
@@ -193,6 +198,11 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*Template{})
 		}
 		return reflect.TypeOf(&Template{})
+	case "user":
+		if cmd.IsList {
+			return reflect.TypeOf([]*User{})
+		}
+		return reflect.TypeOf(&User{})
 	case "vmpassword":
 		if cmd.IsList {
 			return reflect.TypeOf([]*VMPassword{})
