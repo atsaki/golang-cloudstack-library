@@ -1,6 +1,7 @@
 package cloudstack
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -101,4 +102,40 @@ func TestListVirtualMachines(t *testing.T) {
 	if vms[0].client.EndPoint != endpoint {
 		t.Errorf("endpoint: actual %v, expected %v", vms[0].client.EndPoint, endpoint)
 	}
+}
+
+func TestGetVirtualMachineUserData(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := `
+{
+    "getvirtualmachineuserdataresponse": {
+        "virtualmachineuserdata": {
+            "userdata": "dGVzdGRhdGE=",
+            "virtualmachineid": "869cad78-2232-4c4e-8018-f38462cbc1df"
+        }
+    }
+}
+		`
+		fmt.Fprintln(w, resp)
+	}))
+	defer server.Close()
+
+	endpoint, _ := url.Parse(server.URL)
+	client, _ := NewClient(endpoint, "APIKEY", "SECRETKEY", "", "")
+	p := NewGetVirtualMachineUserDataParameter("869cad78-2232-4c4e-8018-f38462cbc1df")
+	ud, _ := client.GetVirtualMachineUserData(p)
+
+	if ud.VirtualMachineId.String() != "869cad78-2232-4c4e-8018-f38462cbc1df" {
+		t.Errorf("virtualmachineid: actual %s, expected 869cad78-2232-4c4e-8018-f38462cbc1df", ud.VirtualMachineId.String())
+	}
+
+	if ud.UserData.String() != "dGVzdGRhdGE=" {
+		t.Errorf("userdata: actual %s, expected dGVzdGRhdGE=", ud.UserData.String())
+	}
+
+	decoded, _ := base64.StdEncoding.DecodeString(ud.UserData.String())
+	if string(decoded) != "testdata" {
+		t.Errorf("userdata: actual %s, expected testdata", string(decoded))
+	}
+
 }

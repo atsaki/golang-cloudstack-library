@@ -1,6 +1,5 @@
 package cloudstack
 
-
 // AddNicToVirtualMachine represents the paramter of AddNicToVirtualMachine
 type AddNicToVirtualMachineParameter struct {
 	// IP Address for the new network
@@ -27,7 +26,6 @@ func (c *Client) AddNicToVirtualMachine(p *AddNicToVirtualMachineParameter) (*Vi
 	return obj.(*VirtualMachine), err
 }
 
-
 // GetVMPassword represents the paramter of GetVMPassword
 type GetVMPasswordParameter struct {
 	// The ID of the virtual machine
@@ -49,7 +47,6 @@ func (c *Client) GetVMPassword(p *GetVMPasswordParameter) (*VMPassword, error) {
 	return obj.(*VMPassword), err
 }
 
-
 // CleanVMReservations represents the paramter of CleanVMReservations
 type CleanVMReservationsParameter struct {
 }
@@ -68,6 +65,26 @@ func (c *Client) CleanVMReservations(p *CleanVMReservationsParameter) (*Result, 
 	return obj.(*Result), err
 }
 
+// GetVirtualMachineUserData represents the paramter of GetVirtualMachineUserData
+type GetVirtualMachineUserDataParameter struct {
+	// The ID of the virtual machine
+	VirtualMachineId ID
+}
+
+func NewGetVirtualMachineUserDataParameter(virtualmachineid string) (p *GetVirtualMachineUserDataParameter) {
+	p = new(GetVirtualMachineUserDataParameter)
+	p.VirtualMachineId.Set(virtualmachineid)
+	return p
+}
+
+// Returns user data associated with the VM
+func (c *Client) GetVirtualMachineUserData(p *GetVirtualMachineUserDataParameter) (*VirtualMachineUserData, error) {
+	obj, err := c.Request("getVirtualMachineUserData", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.(*VirtualMachineUserData), err
+}
 
 // RecoverVirtualMachine represents the paramter of RecoverVirtualMachine
 type RecoverVirtualMachineParameter struct {
@@ -89,7 +106,6 @@ func (c *Client) RecoverVirtualMachine(p *RecoverVirtualMachineParameter) (*Virt
 	}
 	return obj.(*VirtualMachine), err
 }
-
 
 // DeployVirtualMachine represents the paramter of DeployVirtualMachine
 type DeployVirtualMachineParameter struct {
@@ -199,7 +215,6 @@ func (c *Client) DeployVirtualMachine(p *DeployVirtualMachineParameter) (*Virtua
 	return obj.(*VirtualMachine), err
 }
 
-
 // ExpungeVirtualMachine represents the paramter of ExpungeVirtualMachine
 type ExpungeVirtualMachineParameter struct {
 	// The ID of the virtual machine
@@ -220,7 +235,6 @@ func (c *Client) ExpungeVirtualMachine(p *ExpungeVirtualMachineParameter) (*Resu
 	}
 	return obj.(*Result), err
 }
-
 
 // ScaleVirtualMachine represents the paramter of ScaleVirtualMachine
 type ScaleVirtualMachineParameter struct {
@@ -249,7 +263,6 @@ func (c *Client) ScaleVirtualMachine(p *ScaleVirtualMachineParameter) (*Result, 
 	return obj.(*Result), err
 }
 
-
 // RebootVirtualMachine represents the paramter of RebootVirtualMachine
 type RebootVirtualMachineParameter struct {
 	// The ID of the virtual machine
@@ -270,7 +283,6 @@ func (c *Client) RebootVirtualMachine(p *RebootVirtualMachineParameter) (*Virtua
 	}
 	return obj.(*VirtualMachine), err
 }
-
 
 // RemoveNicFromVirtualMachine represents the paramter of RemoveNicFromVirtualMachine
 type RemoveNicFromVirtualMachineParameter struct {
@@ -296,7 +308,6 @@ func (c *Client) RemoveNicFromVirtualMachine(p *RemoveNicFromVirtualMachineParam
 	return obj.(*VirtualMachine), err
 }
 
-
 // UpdateDefaultNicForVirtualMachine represents the paramter of UpdateDefaultNicForVirtualMachine
 type UpdateDefaultNicForVirtualMachineParameter struct {
 	// NIC ID
@@ -321,7 +332,6 @@ func (c *Client) UpdateDefaultNicForVirtualMachine(p *UpdateDefaultNicForVirtual
 	return obj.(*VirtualMachine), err
 }
 
-
 // ResetPasswordForVirtualMachine represents the paramter of ResetPasswordForVirtualMachine
 type ResetPasswordForVirtualMachineParameter struct {
 	// The ID of the virtual machine
@@ -344,7 +354,6 @@ func (c *Client) ResetPasswordForVirtualMachine(p *ResetPasswordForVirtualMachin
 	}
 	return obj.(*VirtualMachine), err
 }
-
 
 // ChangeServiceForVirtualMachine represents the paramter of ChangeServiceForVirtualMachine
 type ChangeServiceForVirtualMachineParameter struct {
@@ -374,7 +383,6 @@ func (c *Client) ChangeServiceForVirtualMachine(p *ChangeServiceForVirtualMachin
 	return obj.(*VirtualMachine), err
 }
 
-
 // StartVirtualMachine represents the paramter of StartVirtualMachine
 type StartVirtualMachineParameter struct {
 	// Deployment planner to use for vm allocation. Available to ROOT admin only
@@ -400,7 +408,6 @@ func (c *Client) StartVirtualMachine(p *StartVirtualMachineParameter) (*VirtualM
 	}
 	return obj.(*VirtualMachine), err
 }
-
 
 // MigrateVirtualMachine represents the paramter of MigrateVirtualMachine
 type MigrateVirtualMachineParameter struct {
@@ -429,7 +436,6 @@ func (c *Client) MigrateVirtualMachine(p *MigrateVirtualMachineParameter) (*Virt
 	}
 	return obj.(*VirtualMachine), err
 }
-
 
 // AssignVirtualMachine represents the paramter of AssignVirtualMachine
 type AssignVirtualMachineParameter struct {
@@ -469,7 +475,6 @@ func (c *Client) AssignVirtualMachine(p *AssignVirtualMachineParameter) (*Virtua
 	}
 	return obj.(*VirtualMachine), err
 }
-
 
 // UpdateVirtualMachine represents the paramter of UpdateVirtualMachine
 type UpdateVirtualMachineParameter struct {
@@ -520,7 +525,6 @@ func (c *Client) UpdateVirtualMachine(p *UpdateVirtualMachineParameter) (*Virtua
 	return obj.(*VirtualMachine), err
 }
 
-
 // RestoreVirtualMachine represents the paramter of RestoreVirtualMachine
 type RestoreVirtualMachineParameter struct {
 	// an optional template Id to restore vm from the new template. This can be an
@@ -544,7 +548,6 @@ func (c *Client) RestoreVirtualMachine(p *RestoreVirtualMachineParameter) (*Virt
 	}
 	return obj.(*VirtualMachine), err
 }
-
 
 // MigrateVirtualMachineWithVolume represents the paramter of MigrateVirtualMachineWithVolume
 type MigrateVirtualMachineWithVolumeParameter struct {
@@ -572,7 +575,6 @@ func (c *Client) MigrateVirtualMachineWithVolume(p *MigrateVirtualMachineWithVol
 	return obj.(*VirtualMachine), err
 }
 
-
 // StopVirtualMachine represents the paramter of StopVirtualMachine
 type StopVirtualMachineParameter struct {
 	// Force stop the VM (vm is marked as Stopped even when command fails to be send
@@ -596,7 +598,6 @@ func (c *Client) StopVirtualMachine(p *StopVirtualMachineParameter) (*VirtualMac
 	}
 	return obj.(*VirtualMachine), err
 }
-
 
 // DestroyVirtualMachine represents the paramter of DestroyVirtualMachine
 type DestroyVirtualMachineParameter struct {
@@ -622,7 +623,6 @@ func (c *Client) DestroyVirtualMachine(p *DestroyVirtualMachineParameter) (*Virt
 	}
 	return obj.(*VirtualMachine), err
 }
-
 
 // ListVirtualMachines represents the paramter of ListVirtualMachines
 type ListVirtualMachinesParameter struct {
@@ -702,4 +702,3 @@ func (c *Client) ListVirtualMachines(p *ListVirtualMachinesParameter) ([]*Virtua
 	}
 	return obj.([]*VirtualMachine), err
 }
-

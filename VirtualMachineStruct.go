@@ -123,3 +123,11 @@ type VirtualMachine struct {
 	// the name of the availability zone for the virtual machine
 	ZoneName NullString `json:"zonename"`
 }
+
+type VirtualMachineUserData struct {
+	ResourceBase
+	// Base 64 encoded VM user data
+	UserData NullString `json:"userdata"`
+	// the ID of the virtual machine
+	VirtualMachineId ID `json:"virtualmachineid"`
+}

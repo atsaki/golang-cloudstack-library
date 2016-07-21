@@ -213,6 +213,11 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*VirtualMachine{})
 		}
 		return reflect.TypeOf(&VirtualMachine{})
+	case "virtualmachineuserdata":
+		if cmd.IsList {
+			return reflect.TypeOf([]*VirtualMachineUserData{})
+		}
+		return reflect.TypeOf(&VirtualMachineUserData{})
 	case "volume":
 		if cmd.IsList {
 			return reflect.TypeOf([]*Volume{})
