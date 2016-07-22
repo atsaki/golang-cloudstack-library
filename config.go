@@ -1,6 +1,7 @@
 package cloudstack
 
 import (
+	"log"
 	"reflect"
 	"strings"
 	"time"
@@ -234,6 +235,7 @@ func (cmd Command) ReflectType() reflect.Type {
 		}
 		return reflect.TypeOf(&Zone{})
 	default:
+		log.Printf("Unknow ObjectType : %s", cmd.ObjectType)
 		return nil
 	}
 }
