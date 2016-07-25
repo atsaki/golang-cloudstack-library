@@ -41,6 +41,8 @@ type DiskOffering struct {
 	MinIops NullNumber `json:"miniops"`
 	// the name of the disk offering
 	Name NullString `json:"name"`
+	// provisioning type used to create volumes. Valid values are thin, sparse, fat.
+	ProvisioningType NullString `json:"provisioningtype"`
 	// the storage type for this disk offering
 	StorageType NullString `json:"storagetype"`
 	// the tags for the disk offering
