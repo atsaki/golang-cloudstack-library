@@ -34,6 +34,11 @@ func (cmd Command) Pointer() interface{} {
 
 func (cmd Command) ReflectType() reflect.Type {
 	switch cmd.ObjectType {
+	case "account":
+		if cmd.IsList {
+			return reflect.TypeOf([]*Account{})
+		}
+		return reflect.TypeOf(&Account{})
 	case "affinitygroup":
 		if cmd.IsList {
 			return reflect.TypeOf([]*AffinityGroup{})
@@ -159,6 +164,16 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*PortForwardingRule{})
 		}
 		return reflect.TypeOf(&PortForwardingRule{})
+	case "project":
+		if cmd.IsList {
+			return reflect.TypeOf([]*Project{})
+		}
+		return reflect.TypeOf(&Project{})
+	case "projectaccount":
+		if cmd.IsList {
+			return reflect.TypeOf([]*ProjectAccount{})
+		}
+		return reflect.TypeOf(&ProjectAccount{})
 	case "publicipaddress":
 		if cmd.IsList {
 			return reflect.TypeOf([]*PublicIpAddress{})
