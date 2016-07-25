@@ -15,6 +15,10 @@ func TestListAccounts(t *testing.T) {
     "listaccountsresponse": {
         "account": [
             {
+                "accountdetails": {
+                    "key0": "value0",
+                    "key1": "value1"
+                },
                 "accounttype": 1,
                 "cpuavailable": "Unlimited",
                 "cpulimit": "Unlimited",
@@ -111,5 +115,9 @@ func TestListAccounts(t *testing.T) {
 
 	if accounts[0].User[0].UserName.String() != "admin" {
 		t.Errorf("username: actual %s, expected admin", accounts[0].User[0].UserName.String())
+	}
+
+	if accounts[0].AccountDetails["key0"] != "value0" {
+		t.Errorf("accountdetails[\"key0\"]: actual %s, expected value0", accounts[0].AccountDetails["key0"])
 	}
 }

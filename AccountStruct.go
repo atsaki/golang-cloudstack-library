@@ -3,7 +3,7 @@ package cloudstack
 type Account struct {
 	ResourceBase
 	// details for the account
-	AccountDetails NullString `json:"accountdetails"`
+	AccountDetails map[string]string `json:"accountdetails"`
 	// account type (admin, domain-admin, user)
 	AccountType NullNumber `json:"accounttype"`
 	// the total number of cpu cores available to be created for this account
