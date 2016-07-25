@@ -52,13 +52,15 @@ func getResponseContent(cmd *Command, resp []byte) (respBody []byte, err error) 
 		return nil, err
 	}
 
-	if cmd.Name == "listSecondaryStagingStores" {
+	name := strings.ToLower(cmd.Name)
+
+	if name == "listsecondarystagingstores" {
 		respBody, ok = respMap["listsecondarystagingstoreresponse"]
 	} else {
-		respBody, ok = respMap[strings.ToLower(cmd.Name)+"response"]
+		respBody, ok = respMap[name+"response"]
 		if !ok {
 			// some API's response are not ended with "response"
-			respBody, ok = respMap[strings.ToLower(cmd.Name)]
+			respBody, ok = respMap[name]
 		}
 	}
 	if !ok {
@@ -66,8 +68,8 @@ func getResponseContent(cmd *Command, resp []byte) (respBody []byte, err error) 
 			return nil, errors.New(errortext)
 		}
 		return nil, fmt.Errorf(
-			"Unexpected format: response doesn't contain %s or %s or errortext",
-			cmd.Name+"response", cmd.Name)
+			"Unexpected format: API response doesn't contain %s or %s or errortext",
+			name+"response", name)
 	}
 	return respBody, nil
 }
