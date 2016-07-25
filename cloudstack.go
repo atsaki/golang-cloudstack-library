@@ -52,10 +52,14 @@ func getResponseContent(cmd *Command, resp []byte) (respBody []byte, err error) 
 		return nil, err
 	}
 
-	respBody, ok = respMap[strings.ToLower(cmd.Name)+"response"]
-	if !ok {
-		// some API's response are not ended with "response"
-		respBody, ok = respMap[strings.ToLower(cmd.Name)]
+	if cmd.Name == "listSecondaryStagingStores" {
+		respBody, ok = respMap["listsecondarystagingstoreresponse"]
+	} else {
+		respBody, ok = respMap[strings.ToLower(cmd.Name)+"response"]
+		if !ok {
+			// some API's response are not ended with "response"
+			respBody, ok = respMap[strings.ToLower(cmd.Name)]
+		}
 	}
 	if !ok {
 		if errortext := getErrorText(respMap); errortext != "" {

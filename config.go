@@ -59,6 +59,11 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*Cluster{})
 		}
 		return reflect.TypeOf(&Cluster{})
+	case "dataStoreProvider":
+		if cmd.IsList {
+			return reflect.TypeOf([]*StorageProvider{})
+		}
+		return reflect.TypeOf(&StorageProvider{})
 	case "dedicatedcluster":
 		if cmd.IsList {
 			return reflect.TypeOf([]*DedicatedCluster{})
@@ -99,6 +104,11 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*HostTag{})
 		}
 		return reflect.TypeOf(&HostTag{})
+	case "imagestore":
+		if cmd.IsList {
+			return reflect.TypeOf([]*ImageStore{})
+		}
+		return reflect.TypeOf(&ImageStore{})
 	case "ipaddress":
 		if cmd.IsList {
 			return reflect.TypeOf([]*PublicIpAddress{})
@@ -184,6 +194,11 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*Result{})
 		}
 		return reflect.TypeOf(&Result{})
+	case "secondarystorage":
+		if cmd.IsList {
+			return reflect.TypeOf([]*ImageStore{})
+		}
+		return reflect.TypeOf(&ImageStore{})
 	case "securitygroupegress":
 		if cmd.IsList {
 			return reflect.TypeOf([]*SecurityGroupEgress{})
@@ -204,6 +219,11 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*ServiceOffering{})
 		}
 		return reflect.TypeOf(&ServiceOffering{})
+	case "storagepool":
+		if cmd.IsList {
+			return reflect.TypeOf([]*StoragePool{})
+		}
+		return reflect.TypeOf(&StoragePool{})
 	case "tag":
 		if cmd.IsList {
 			return reflect.TypeOf([]*Tag{})
@@ -619,7 +639,7 @@ func getCommand(name string) *Command {
 			Name:       "cancelStorageMaintenance",
 			IsAsync:    true,
 			IsList:     false,
-			ObjectType: "storagemaintenance",
+			ObjectType: "storagepool",
 		}
 	case "changeserviceforrouter":
 		return &Command{
@@ -934,7 +954,7 @@ func getCommand(name string) *Command {
 			Name:       "createSecondaryStagingStore",
 			IsAsync:    false,
 			IsList:     false,
-			ObjectType: "secondarystagingstore",
+			ObjectType: "imagestore",
 		}
 	case "createsecuritygroup":
 		return &Command{
@@ -1774,7 +1794,7 @@ func getCommand(name string) *Command {
 			Name:       "enableStorageMaintenance",
 			IsAsync:    true,
 			IsList:     false,
-			ObjectType: "storagemaintenance",
+			ObjectType: "storagepool",
 		}
 	case "enableuser":
 		return &Command{
@@ -2537,7 +2557,7 @@ func getCommand(name string) *Command {
 			Name:       "listSecondaryStagingStores",
 			IsAsync:    false,
 			IsList:     true,
-			ObjectType: "secondarystagingstore",
+			ObjectType: "imagestore",
 		}
 	case "listsecuritygroups":
 		return &Command{
@@ -2614,7 +2634,7 @@ func getCommand(name string) *Command {
 			Name:       "listStorageProviders",
 			IsAsync:    false,
 			IsList:     true,
-			ObjectType: "storageprovider",
+			ObjectType: "dataStoreProvider",
 		}
 	case "listsupportednetworkservices":
 		return &Command{
