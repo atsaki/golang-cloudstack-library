@@ -1,6 +1,5 @@
 package cloudstack
 
-
 // DeleteEgressFirewallRule represents the paramter of DeleteEgressFirewallRule
 type DeleteEgressFirewallRuleParameter struct {
 	// the ID of the firewall rule
@@ -22,7 +21,6 @@ func (c *Client) DeleteEgressFirewallRule(p *DeleteEgressFirewallRuleParameter) 
 	return obj.(*Result), err
 }
 
-
 // DeleteFirewallRule represents the paramter of DeleteFirewallRule
 type DeleteFirewallRuleParameter struct {
 	// the ID of the firewall rule
@@ -43,7 +41,6 @@ func (c *Client) DeleteFirewallRule(p *DeleteFirewallRuleParameter) (*Result, er
 	}
 	return obj.(*Result), err
 }
-
 
 // UpdatePortForwardingRule represents the paramter of UpdatePortForwardingRule
 type UpdatePortForwardingRuleParameter struct {
@@ -84,7 +81,6 @@ func (c *Client) UpdatePortForwardingRule(p *UpdatePortForwardingRuleParameter) 
 	return obj.(*PortForwardingRule), err
 }
 
-
 // ListPortForwardingRules represents the paramter of ListPortForwardingRules
 type ListPortForwardingRulesParameter struct {
 	// list resources by account. Must be used with the domainId parameter.
@@ -107,7 +103,7 @@ type ListPortForwardingRulesParameter struct {
 	// set to true - list resources that the caller is authorized to see. Default
 	// value is false
 	ListAll NullBool
-	// list port forwarding rules for ceratin network
+	// list port forwarding rules for certain network
 	NetworkId ID
 	Page      NullNumber
 	PageSize  NullNumber
@@ -131,7 +127,6 @@ func (c *Client) ListPortForwardingRules(p *ListPortForwardingRulesParameter) ([
 	return obj.([]*PortForwardingRule), err
 }
 
-
 // CreatePortForwardingRule represents the paramter of CreatePortForwardingRule
 type CreatePortForwardingRuleParameter struct {
 	// the cidr list to forward traffic from
@@ -140,12 +135,12 @@ type CreatePortForwardingRuleParameter struct {
 	ForDisplay NullBool
 	// the IP address id of the port forwarding rule
 	IpAddressId ID
-	// The network of the vm the Port Forwarding rule will be created for. Required
-	// when public Ip address is not associated with any Guest network yet (VPC
-	// case)
+	// the network of the virtual machine the port forwarding rule will be created
+	// for. Required when public IP address is not associated with any guest network
+	// yet (VPC case).
 	NetworkId ID
-	// if true, firewall rule for source/end pubic port is automatically created; if
-	// false - firewall rule has to be created explicitely. If not specified 1)
+	// if true, firewall rule for source/end public port is automatically created;
+	// if false - firewall rule has to be created explicitly. If not specified 1)
 	// defaulted to false when PF rule is being created for VPC guest network 2) in
 	// all other cases defaulted to true
 	OpenFirewall NullBool
@@ -161,7 +156,7 @@ type CreatePortForwardingRuleParameter struct {
 	PublicPort NullNumber
 	// the ID of the virtual machine for the port forwarding rule
 	VirtualMachineId ID
-	// VM guest nic Secondary ip address for the port forwarding rule
+	// VM guest nic secondary IP address for the port forwarding rule
 	VmGuestIp NullString
 }
 
@@ -183,7 +178,6 @@ func (c *Client) CreatePortForwardingRule(p *CreatePortForwardingRuleParameter) 
 	}
 	return obj.(*PortForwardingRule), err
 }
-
 
 // CreateEgressFirewallRule represents the paramter of CreateEgressFirewallRule
 type CreateEgressFirewallRuleParameter struct {
@@ -223,7 +217,6 @@ func (c *Client) CreateEgressFirewallRule(p *CreateEgressFirewallRuleParameter) 
 	return obj.(*FirewallRule), err
 }
 
-
 // UpdateEgressFirewallRule represents the paramter of UpdateEgressFirewallRule
 type UpdateEgressFirewallRuleParameter struct {
 	// an optional field, in case you want to set a custom id to the resource.
@@ -250,7 +243,6 @@ func (c *Client) UpdateEgressFirewallRule(p *UpdateEgressFirewallRuleParameter) 
 	return obj.(*FirewallRule), err
 }
 
-
 // DeletePortForwardingRule represents the paramter of DeletePortForwardingRule
 type DeletePortForwardingRuleParameter struct {
 	// the ID of the port forwarding rule
@@ -271,7 +263,6 @@ func (c *Client) DeletePortForwardingRule(p *DeletePortForwardingRuleParameter) 
 	}
 	return obj.(*Result), err
 }
-
 
 // ListFirewallRules represents the paramter of ListFirewallRules
 type ListFirewallRulesParameter struct {
@@ -319,7 +310,6 @@ func (c *Client) ListFirewallRules(p *ListFirewallRulesParameter) ([]*FirewallRu
 	return obj.([]*FirewallRule), err
 }
 
-
 // UpdateFirewallRule represents the paramter of UpdateFirewallRule
 type UpdateFirewallRuleParameter struct {
 	// an optional field, in case you want to set a custom id to the resource.
@@ -345,7 +335,6 @@ func (c *Client) UpdateFirewallRule(p *UpdateFirewallRuleParameter) (*FirewallRu
 	}
 	return obj.(*FirewallRule), err
 }
-
 
 // CreateFirewallRule represents the paramter of CreateFirewallRule
 type CreateFirewallRuleParameter struct {
@@ -385,7 +374,6 @@ func (c *Client) CreateFirewallRule(p *CreateFirewallRuleParameter) (*FirewallRu
 	return obj.(*FirewallRule), err
 }
 
-
 // ListEgressFirewallRules represents the paramter of ListEgressFirewallRules
 type ListEgressFirewallRulesParameter struct {
 	// list resources by account. Must be used with the domainId parameter.
@@ -408,7 +396,7 @@ type ListEgressFirewallRulesParameter struct {
 	// set to true - list resources that the caller is authorized to see. Default
 	// value is false
 	ListAll NullBool
-	// the id network network for the egress firwall services
+	// list firewall rules for ceratin network
 	NetworkId ID
 	Page      NullNumber
 	PageSize  NullNumber
@@ -431,4 +419,3 @@ func (c *Client) ListEgressFirewallRules(p *ListEgressFirewallRulesParameter) ([
 	}
 	return obj.([]*FirewallRule), err
 }
-
