@@ -59,6 +59,8 @@ type Volume struct {
 	Project NullString `json:"project"`
 	// the project id of the vpn
 	ProjectId ID `json:"projectid"`
+	// provisioning type used to create volumes.
+	ProvisioningType NullString `json:"provisioningtype"`
 	// need quiesce vm or not when taking snapshot
 	QuiesceVm NullBool `json:"quiescevm"`
 	// the display text of the service offering for root disk
