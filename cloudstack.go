@@ -122,6 +122,15 @@ func getObjectJson(cmd *Command, resp []byte, isJobResult bool) (objJson []byte,
 	}
 }
 
+func sign(queryStr, secretKey string) string {
+	queryStr = strings.ToLower(queryStr)
+	queryStr = strings.Replace(queryStr, "+", "%20", -1)
+	queryStr = strings.Replace(queryStr, "@", "%40", -1)
+	mac := hmac.New(sha1.New, []byte(secretKey))
+	mac.Write([]byte(queryStr))
+	return url.QueryEscape(base64.StdEncoding.EncodeToString(mac.Sum(nil)))
+}
+
 func (client *Client) convertResponseJsonToObject(cmd *Command, resp []byte, isJobResult bool) (interface{}, error) {
 
 	objJson, err := getObjectJson(cmd, resp, isJobResult)
@@ -266,11 +275,17 @@ func (c *Client) GenerateQueryURL(command string, params map[string]interface{})
 			}
 		case map[string]string:
 			if len(v) > 0 {
-				i := 0
-				for key, value := range v {
-					values.Add(fmt.Sprintf("%s[%d].key", k, i), key)
-					values.Add(fmt.Sprintf("%s[%d].value", k, i), value)
-					i += 1
+				if k == "tags" {
+					i := 0
+					for key, value := range v {
+						values.Add(fmt.Sprintf("%s[%d].key", k, i), key)
+						values.Add(fmt.Sprintf("%s[%d].value", k, i), value)
+						i += 1
+					}
+				} else {
+					for key, value := range v {
+						values.Add(fmt.Sprintf("%s[0].%s", k, key), value)
+					}
 				}
 			}
 		case NullBool, NullString, NullNumber, ID:
@@ -296,12 +311,7 @@ func (c *Client) GenerateQueryURL(command string, params map[string]interface{})
 			params = append(params, fmt.Sprintf("%s=%s", k, values[k][0]))
 		}
 		queryStr := strings.Join(params, "&")
-
-		mac := hmac.New(sha1.New, []byte(c.SecretKey))
-		mac.Write([]byte(
-			strings.ToLower(strings.Replace(queryStr, "+", "%20", -1))))
-		signature := base64.StdEncoding.EncodeToString(mac.Sum(nil))
-		signature = url.QueryEscape(signature)
+		signature := sign(queryStr, c.SecretKey)
 		queryURL.RawQuery = queryStr + "&signature=" + signature
 	} else {
 		if command == "login" && c.Username != "" && c.Password != "" {
