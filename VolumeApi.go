@@ -1,6 +1,5 @@
 package cloudstack
 
-
 // ExtractVolume represents the paramter of ExtractVolume
 type ExtractVolumeParameter struct {
 	// the ID of the volume
@@ -29,7 +28,6 @@ func (c *Client) ExtractVolume(p *ExtractVolumeParameter) (*Volume, error) {
 	}
 	return obj.(*Volume), err
 }
-
 
 // ListVolumes represents the paramter of ListVolumes
 type ListVolumesParameter struct {
@@ -89,7 +87,6 @@ func (c *Client) ListVolumes(p *ListVolumesParameter) ([]*Volume, error) {
 	return obj.([]*Volume), err
 }
 
-
 // MigrateVolume represents the paramter of MigrateVolume
 type MigrateVolumeParameter struct {
 	// if the volume should be live migrated when it is attached to a running vm
@@ -116,13 +113,12 @@ func (c *Client) MigrateVolume(p *MigrateVolumeParameter) (*Volume, error) {
 	return obj.(*Volume), err
 }
 
-
 // AttachVolume represents the paramter of AttachVolume
 type AttachVolumeParameter struct {
 	// the ID of the device to map the volume to within the guest OS. If no deviceId
 	// is passed in, the next available deviceId will be chosen. Possible values for
-	// a Linux OS are:* 1 - /dev/xvdb* 2 - /dev/xvdc* 4 - /dev/xvde* 5 - /dev/xvdf*
-	// 6 - /dev/xvdg* 7 - /dev/xvdh* 8 - /dev/xvdi* 9 - /dev/xvdj
+	// a Linux OS are:* 0 - /dev/xvda* 1 - /dev/xvdb* 2 - /dev/xvdc* 4 - /dev/xvde*
+	// 5 - /dev/xvdf* 6 - /dev/xvdg* 7 - /dev/xvdh* 8 - /dev/xvdi* 9 - /dev/xvdj
 	DeviceId ID
 	// the ID of the disk volume
 	Id ID
@@ -145,7 +141,6 @@ func (c *Client) AttachVolume(p *AttachVolumeParameter) (*Volume, error) {
 	}
 	return obj.(*Volume), err
 }
-
 
 // UpdateVolume represents the paramter of UpdateVolume
 type UpdateVolumeParameter struct {
@@ -180,16 +175,19 @@ func (c *Client) UpdateVolume(p *UpdateVolumeParameter) (*Volume, error) {
 	return obj.(*Volume), err
 }
 
-
 // ResizeVolume represents the paramter of ResizeVolume
 type ResizeVolumeParameter struct {
 	// new disk offering id
 	DiskOfferingId ID
 	// the ID of the disk volume
 	Id ID
+	// New maximum number of IOPS
+	MaxIops NullNumber
+	// New minimum number of IOPS
+	MinIops NullNumber
 	// Verify OK to Shrink
 	ShrinkOk NullBool
-	// New volume size in G
+	// New volume size in GB
 	Size NullNumber
 }
 
@@ -207,7 +205,6 @@ func (c *Client) ResizeVolume(p *ResizeVolumeParameter) (*Volume, error) {
 	}
 	return obj.(*Volume), err
 }
-
 
 // DetachVolume represents the paramter of DetachVolume
 type DetachVolumeParameter struct {
@@ -233,7 +230,6 @@ func (c *Client) DetachVolume(p *DetachVolumeParameter) (*Volume, error) {
 	return obj.(*Volume), err
 }
 
-
 // DeleteVolume represents the paramter of DeleteVolume
 type DeleteVolumeParameter struct {
 	// The ID of the disk volume
@@ -254,7 +250,6 @@ func (c *Client) DeleteVolume(p *DeleteVolumeParameter) (*Result, error) {
 	}
 	return obj.(*Result), err
 }
-
 
 // CreateVolume represents the paramter of CreateVolume
 type CreateVolumeParameter struct {
@@ -310,13 +305,15 @@ func (c *Client) CreateVolume(p *CreateVolumeParameter) (*Volume, error) {
 	return obj.(*Volume), err
 }
 
-
 // UploadVolume represents the paramter of UploadVolume
 type UploadVolumeParameter struct {
 	// an optional accountName. Must be used with domainId.
 	Account NullString
 	// the MD5 checksum value of this volume
 	Checksum NullString
+	// the ID of the disk offering. This must be a custom sized offering since
+	// during uploadVolume volume size is unknown.
+	DiskOfferingId ID
 	// an optional domainId. If the account parameter is used, domainId must also be
 	// used.
 	DomainId ID
@@ -352,4 +349,3 @@ func (c *Client) UploadVolume(p *UploadVolumeParameter) (*Volume, error) {
 	}
 	return obj.(*Volume), err
 }
-
