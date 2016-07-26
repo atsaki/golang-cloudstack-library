@@ -1,6 +1,5 @@
 package cloudstack
 
-
 // DeleteTags represents the paramter of DeleteTags
 type DeleteTagsParameter struct {
 	// Delete tags for resource id(s)
@@ -26,7 +25,6 @@ func (c *Client) DeleteTags(p *DeleteTagsParameter) (*Result, error) {
 	}
 	return obj.(*Result), err
 }
-
 
 // ListTags represents the paramter of ListTags
 type ListTagsParameter struct {
@@ -73,7 +71,6 @@ func (c *Client) ListTags(p *ListTagsParameter) ([]*Tag, error) {
 	return obj.([]*Tag), err
 }
 
-
 // CreateTags represents the paramter of CreateTags
 type CreateTagsParameter struct {
 	// identifies client specific tag. When the value is not null, the tag can't be
@@ -104,3 +101,24 @@ func (c *Client) CreateTags(p *CreateTagsParameter) (*Result, error) {
 	return obj.(*Result), err
 }
 
+// ListStorageTags represents the paramter of ListStorageTags
+type ListStorageTagsParameter struct {
+	// List by keyword
+	Keyword  NullString
+	Page     NullNumber
+	PageSize NullNumber
+}
+
+func NewListStorageTagsParameter() (p *ListStorageTagsParameter) {
+	p = new(ListStorageTagsParameter)
+	return p
+}
+
+// Lists storage tags
+func (c *Client) ListStorageTags(p *ListStorageTagsParameter) ([]*StorageTag, error) {
+	obj, err := c.Request("listStorageTags", convertParamToMap(p))
+	if err != nil {
+		return nil, err
+	}
+	return obj.([]*StorageTag), err
+}

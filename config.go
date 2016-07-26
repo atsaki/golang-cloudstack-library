@@ -224,6 +224,11 @@ func (cmd Command) ReflectType() reflect.Type {
 			return reflect.TypeOf([]*StoragePool{})
 		}
 		return reflect.TypeOf(&StoragePool{})
+	case "storagetag":
+		if cmd.IsList {
+			return reflect.TypeOf([]*StorageTag{})
+		}
+		return reflect.TypeOf(&StorageTag{})
 	case "tag":
 		if cmd.IsList {
 			return reflect.TypeOf([]*Tag{})
@@ -2628,6 +2633,13 @@ func getCommand(name string) *Command {
 			IsAsync:    false,
 			IsList:     true,
 			ObjectType: "storagepool",
+		}
+	case "liststoragetags":
+		return &Command{
+			Name:       "listStorageTags",
+			IsAsync:    false,
+			IsList:     true,
+			ObjectType: "storagetag",
 		}
 	case "liststorageproviders":
 		return &Command{

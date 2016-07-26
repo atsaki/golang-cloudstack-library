@@ -23,3 +23,13 @@ type Tag struct {
 	// tag value
 	Value NullString `json:"value"`
 }
+
+type StorageTag struct {
+	ResourceBase
+	// the ID of the storage tag
+	Id ID `json:"id"`
+	// the name of the storage tag
+	Name NullString `json:"name"`
+	// the pool ID of the storage tag
+	PoolId ID `json:"poolid"`
+}
