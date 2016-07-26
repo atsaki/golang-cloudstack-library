@@ -1,6 +1,5 @@
 package cloudstack
 
-
 // CreateNetwork represents the paramter of CreateNetwork
 type CreateNetworkParameter struct {
 	// account who will own the network
@@ -28,8 +27,7 @@ type CreateNetworkParameter struct {
 	Gateway NullString
 	// the CIDR of IPv6 network, must be at least /64
 	Ip6Cidr NullString
-	// the gateway of the IPv6 network. Required for Shared networks and Isolated
-	// networks when it belongs to VPC
+	// the gateway of the IPv6 network. Required for Shared networks
 	Ip6Gateway NullString
 	// the isolated private vlan for this network
 	IsolatedPvlan NullString
@@ -79,7 +77,6 @@ func (c *Client) CreateNetwork(p *CreateNetworkParameter) (*Network, error) {
 	}
 	return obj.(*Network), err
 }
-
 
 // ListNetworks represents the paramter of ListNetworks
 type ListNetworksParameter struct {
@@ -148,7 +145,6 @@ func (c *Client) ListNetworks(p *ListNetworksParameter) ([]*Network, error) {
 	return obj.([]*Network), err
 }
 
-
 // RestartNetwork represents the paramter of RestartNetwork
 type RestartNetworkParameter struct {
 	// If cleanup old network elements
@@ -174,7 +170,6 @@ func (c *Client) RestartNetwork(p *RestartNetworkParameter) (*Network, error) {
 	return obj.(*Network), err
 }
 
-
 // DeleteNetwork represents the paramter of DeleteNetwork
 type DeleteNetworkParameter struct {
 	// Force delete a network. Network will be marked as 'Destroy' even when
@@ -198,7 +193,6 @@ func (c *Client) DeleteNetwork(p *DeleteNetworkParameter) (*Result, error) {
 	}
 	return obj.(*Result), err
 }
-
 
 // UpdateNetwork represents the paramter of UpdateNetwork
 type UpdateNetworkParameter struct {
@@ -237,4 +231,3 @@ func (c *Client) UpdateNetwork(p *UpdateNetworkParameter) (*Network, error) {
 	}
 	return obj.(*Network), err
 }
-
