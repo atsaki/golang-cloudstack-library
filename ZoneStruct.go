@@ -41,7 +41,7 @@ type Zone struct {
 	// the network type of the zone; can be Basic or Advanced
 	NetworkType NullString `json:"networktype"`
 	// Meta data associated with the zone (key/value pairs)
-	ResourceDetails NullString `json:"resourcedetails"`
+	ResourceDetails map[string]string `json:"resourcedetails"`
 	// true if security groups support is enabled, false otherwise
 	SecurityGroupsEnabled NullBool `json:"securitygroupsenabled"`
 	// the list of resource tags associated with zone.
