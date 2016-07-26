@@ -1,6 +1,5 @@
 package cloudstack
 
-
 // CopyTemplate represents the paramter of CopyTemplate
 type CopyTemplateParameter struct {
 	// ID of the zone the template is being copied to.
@@ -28,7 +27,6 @@ func (c *Client) CopyTemplate(p *CopyTemplateParameter) (*Template, error) {
 	}
 	return obj.(*Template), err
 }
-
 
 // CreateTemplate represents the paramter of CreateTemplate
 type CreateTemplateParameter struct {
@@ -89,7 +87,6 @@ func (c *Client) CreateTemplate(p *CreateTemplateParameter) (*Template, error) {
 	return obj.(*Template), err
 }
 
-
 // ListTemplatePermissions represents the paramter of ListTemplatePermissions
 type ListTemplatePermissionsParameter struct {
 	// the template ID
@@ -104,14 +101,13 @@ func NewListTemplatePermissionsParameter(id string) (p *ListTemplatePermissionsP
 
 // List template visibility and all accounts that have permissions to view this
 // template.
-func (c *Client) ListTemplatePermissions(p *ListTemplatePermissionsParameter) ([]*TemplatePermission, error) {
+func (c *Client) ListTemplatePermissions(p *ListTemplatePermissionsParameter) (*TemplatePermission, error) {
 	obj, err := c.Request("listTemplatePermissions", convertParamToMap(p))
 	if err != nil {
 		return nil, err
 	}
-	return obj.([]*TemplatePermission), err
+	return obj.(*TemplatePermission), err
 }
-
 
 // DeleteTemplate represents the paramter of DeleteTemplate
 type DeleteTemplateParameter struct {
@@ -137,7 +133,6 @@ func (c *Client) DeleteTemplate(p *DeleteTemplateParameter) (*Result, error) {
 	return obj.(*Result), err
 }
 
-
 // RegisterTemplate represents the paramter of RegisterTemplate
 type RegisterTemplateParameter struct {
 	// an optional accountName. Must be used with domainId.
@@ -153,7 +148,7 @@ type RegisterTemplateParameter struct {
 	// an optional domainId. If the account parameter is used, domainId must also be
 	// used.
 	DomainId ID
-	// the format for the template. Possible values include QCOW2, RAW, and VHD.
+	// the format for the template. Possible values include QCOW2, RAW, VHD and OVA.
 	Format NullString
 	// the target hypervisor for the template
 	Hypervisor NullString
@@ -210,7 +205,6 @@ func (c *Client) RegisterTemplate(p *RegisterTemplateParameter) (*Template, erro
 	}
 	return obj.(*Template), err
 }
-
 
 // ListTemplates represents the paramter of ListTemplates
 type ListTemplatesParameter struct {
@@ -271,7 +265,6 @@ func (c *Client) ListTemplates(p *ListTemplatesParameter) ([]*Template, error) {
 	return obj.([]*Template), err
 }
 
-
 // PrepareTemplate represents the paramter of PrepareTemplate
 type PrepareTemplateParameter struct {
 	// template ID of the template to be prepared in primary storage(s).
@@ -296,11 +289,12 @@ func (c *Client) PrepareTemplate(p *PrepareTemplateParameter) (*Template, error)
 	return obj.(*Template), err
 }
 
-
 // UpdateTemplate represents the paramter of UpdateTemplate
 type UpdateTemplateParameter struct {
-	// true if image is bootable, false otherwise
+	// true if image is bootable, false otherwise; available only for updateIso API
 	Bootable NullBool
+	// Details in key/value pairs.
+	Details map[string]string
 	// the display text of the image
 	DisplayText NullString
 	// the format for the image
@@ -319,6 +313,9 @@ type UpdateTemplateParameter struct {
 	OsTypeId ID
 	// true if the image supports the password reset feature; default is false
 	PasswordEnabled NullBool
+	// true if the template requres HVM, false otherwise; available only for
+	// updateTemplate API
+	RequiresHvm NullBool
 	// sort key of the template, integer
 	SortKey NullNumber
 }
@@ -337,7 +334,6 @@ func (c *Client) UpdateTemplate(p *UpdateTemplateParameter) (*Template, error) {
 	}
 	return obj.(*Template), err
 }
-
 
 // ExtractTemplate represents the paramter of ExtractTemplate
 type ExtractTemplateParameter struct {
@@ -366,7 +362,6 @@ func (c *Client) ExtractTemplate(p *ExtractTemplateParameter) (*Template, error)
 	}
 	return obj.(*Template), err
 }
-
 
 // UpdateTemplatePermissions represents the paramter of UpdateTemplatePermissions
 type UpdateTemplatePermissionsParameter struct {
@@ -407,4 +402,3 @@ func (c *Client) UpdateTemplatePermissions(p *UpdateTemplatePermissionsParameter
 	}
 	return obj.(*Result), err
 }
-

@@ -2668,7 +2668,7 @@ func getCommand(name string) *Command {
 		return &Command{
 			Name:       "listTemplatePermissions",
 			IsAsync:    false,
-			IsList:     true,
+			IsList:     false,
 			ObjectType: "templatepermission",
 		}
 	case "listtemplates":
