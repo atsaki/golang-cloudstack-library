@@ -1,6 +1,5 @@
 package cloudstack
 
-
 // UpdateDiskOffering represents the paramter of UpdateDiskOffering
 type UpdateDiskOfferingParameter struct {
 	// an optional field, whether to display the offering to the end user or not.
@@ -30,7 +29,6 @@ func (c *Client) UpdateDiskOffering(p *UpdateDiskOfferingParameter) (*DiskOfferi
 	return obj.(*DiskOffering), err
 }
 
-
 // ListDiskOfferings represents the paramter of ListDiskOfferings
 type ListDiskOfferingsParameter struct {
 	// the ID of the domain of the disk offering.
@@ -59,7 +57,6 @@ func (c *Client) ListDiskOfferings(p *ListDiskOfferingsParameter) ([]*DiskOfferi
 	return obj.([]*DiskOffering), err
 }
 
-
 // DeleteDiskOffering represents the paramter of DeleteDiskOffering
 type DeleteDiskOfferingParameter struct {
 	// ID of the disk offering
@@ -80,7 +77,6 @@ func (c *Client) DeleteDiskOffering(p *DeleteDiskOfferingParameter) (*Result, er
 	}
 	return obj.(*Result), err
 }
-
 
 // CreateDiskOffering represents the paramter of CreateDiskOffering
 type CreateDiskOfferingParameter struct {
@@ -113,6 +109,8 @@ type CreateDiskOfferingParameter struct {
 	MinIops NullNumber
 	// name of the disk offering
 	Name NullString
+	// provisioning type used to create volumes. Valid values are thin, sparse, fat.
+	ProvisioningType NullString
 	// the storage type of the disk offering. Values are local and shared.
 	StorageType NullString
 	// tags for the disk offering
@@ -134,4 +132,3 @@ func (c *Client) CreateDiskOffering(p *CreateDiskOfferingParameter) (*DiskOfferi
 	}
 	return obj.(*DiskOffering), err
 }
-
