@@ -15,7 +15,7 @@ type VirtualMachine struct {
 	// the date when this virtual machine was created
 	Created NullString `json:"created"`
 	// Vm details in key/value pairs.
-	Details NullString `json:"details"`
+	Details map[string]string `json:"details"`
 	// the read (io) of disk on the vm
 	DiskIoRead NullNumber `json:"diskioread"`
 	// the write (io) of disk on the vm
@@ -130,4 +130,10 @@ type VirtualMachineUserData struct {
 	UserData NullString `json:"userdata"`
 	// the ID of the virtual machine
 	VirtualMachineId ID `json:"virtualmachineid"`
+}
+
+type VMPassword struct {
+	ResourceBase
+	// The base64 encoded encrypted password of the VM
+	EncryptedPassword NullString `json:"encryptedpassword"`
 }
