@@ -48,7 +48,7 @@ type Host struct {
 	// the date and time the host was created
 	Created NullString `json:"created"`
 	// Host details in key/value pairs.
-	Details NullString `json:"details"`
+	Details map[string]string `json:"details"`
 	// true if the host is disconnected. False otherwise.
 	Disconnected NullString `json:"disconnected"`
 	// the host's currently allocated disk size
