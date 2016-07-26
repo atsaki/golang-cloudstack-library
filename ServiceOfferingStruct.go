@@ -56,8 +56,10 @@ type ServiceOffering struct {
 	NetworkRate NullNumber `json:"networkrate"`
 	// the ha support in the service offering
 	OfferHa NullBool `json:"offerha"`
+	// provisioning type used to create volumes. Valid values are thin, sparse, fat.
+	ProvisioningType NullString `json:"provisioningtype"`
 	// additional key/value details tied with this service offering
-	ServiceOfferingDetails NullString `json:"serviceofferingdetails"`
+	ServiceOfferingDetails map[string]string `json:"serviceofferingdetails"`
 	// the storage type for this service offering
 	StorageType NullString `json:"storagetype"`
 	// is this a the systemvm type for system vm offering
