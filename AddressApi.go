@@ -1,6 +1,5 @@
 package cloudstack
 
-
 // ListPublicIpAddresses represents the paramter of ListPublicIpAddresses
 type ListPublicIpAddressesParameter struct {
 	// list resources by account. Must be used with the domainId parameter.
@@ -41,6 +40,8 @@ type ListPublicIpAddressesParameter struct {
 	PhysicalNetworkId ID
 	// list objects by project
 	ProjectId ID
+	// lists all public IP addresses by state
+	State NullString
 	// List resources by tags (key/value pairs)
 	Tags map[string]string
 	// lists all public IP addresses by VLAN ID
@@ -64,7 +65,6 @@ func (c *Client) ListPublicIpAddresses(p *ListPublicIpAddressesParameter) ([]*Pu
 	}
 	return obj.([]*PublicIpAddress), err
 }
-
 
 // UpdateIpAddress represents the paramter of UpdateIpAddress
 type UpdateIpAddressParameter struct {
@@ -92,7 +92,6 @@ func (c *Client) UpdateIpAddress(p *UpdateIpAddressParameter) (*PublicIpAddress,
 	return obj.(*PublicIpAddress), err
 }
 
-
 // DisassociateIpAddress represents the paramter of DisassociateIpAddress
 type DisassociateIpAddressParameter struct {
 	// the id of the public ip address to disassociate
@@ -113,7 +112,6 @@ func (c *Client) DisassociateIpAddress(p *DisassociateIpAddressParameter) (*Resu
 	}
 	return obj.(*Result), err
 }
-
 
 // AssociateIpAddress represents the paramter of AssociateIpAddress
 type AssociateIpAddressParameter struct {
@@ -151,4 +149,3 @@ func (c *Client) AssociateIpAddress(p *AssociateIpAddressParameter) (*PublicIpAd
 	}
 	return obj.(*PublicIpAddress), err
 }
-
