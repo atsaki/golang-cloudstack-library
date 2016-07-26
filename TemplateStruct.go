@@ -15,7 +15,7 @@ type Template struct {
 	// true if the template is managed across all Zones, false otherwise
 	CrossZones NullBool `json:"crosszones"`
 	// additional key/value details tied with template
-	Details NullString `json:"details"`
+	Details map[string]string `json:"details"`
 	// the template display text
 	DisplayText NullString `json:"displaytext"`
 	// the name of the domain to which the template belongs
@@ -75,4 +75,18 @@ type Template struct {
 	ZoneId ID `json:"zoneid"`
 	// the name of the zone for this template
 	ZoneName NullString `json:"zonename"`
+}
+
+type TemplatePermission struct {
+	ResourceBase
+	// the list of accounts the template is available for
+	Account []NullString `json:"account"`
+	// the ID of the domain to which the template belongs
+	DomainId ID `json:"domainid"`
+	// the template ID
+	Id ID `json:"id"`
+	// true if this template is a public template, false otherwise
+	IsPublic NullBool `json:"ispublic"`
+	// the list of projects the template is available for
+	ProjectIds []ID `json:"projectids"`
 }
