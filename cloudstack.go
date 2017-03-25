@@ -308,7 +308,10 @@ func (c *Client) GenerateQueryURL(command string, params map[string]interface{})
 		sort.Strings(keys)
 		params := make([]string, 0, len(keys))
 		for _, k := range keys {
-			params = append(params, fmt.Sprintf("%s=%s", k, values[k][0]))
+			//params = append(params, fmt.Sprintf("%s=%s", k, values[k][0]))
+			//Encode the "values" or it will break ocassionally
+			encodedValue := url.QueryEscape(values[k][0])
+			params = append(params, fmt.Sprintf("%s=%s", k, encodedValue))
 		}
 		queryStr := strings.Join(params, "&")
 		signature := sign(queryStr, c.SecretKey)
